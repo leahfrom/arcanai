@@ -1,52 +1,52 @@
 {
-  "name": "arcanai",
-  "version": "0.1.0",
-  "description": "A TypeScript CLI for drawing tarot cards and interpreting them with an LLM.",
-  "type": "module",
-  "bin": {
-    "scry": "./dist/cli.js",
-    "arcanai": "./dist/cli.js"
-  },
-  "files": [
-    "dist",
-    "!dist/**/*.test.*",
-    "README.md",
-    "LICENSE"
-  ],
-  "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "dev": "tsx src/cli.tsx",
-    "test": "vitest run",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "prepack": "npm run build"
-  },
-  "keywords": [
-    "tarot",
-    "cli",
-    "ink",
-    "llm",
-    "ai",
-    "ollama",
-    "openai"
-  ],
-  "author": "",
-  "license": "MIT",
-  "engines": {
-    "node": ">=24"
-  },
-  "dependencies": {
-    "@ai-sdk/openai": "^3.0.66",
-    "ai": "^6.0.191",
-    "ink": "^7.0.4",
-    "ollama-ai-provider-v2": "^3.5.1",
-    "react": "^19.2.6",
-    "zod": "^4.4.3"
-  },
-  "devDependencies": {
-    "@types/node": "^24.12.4",
-    "@types/react": "^19.2.15",
-    "tsx": "^4.22.3",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.7"
-  }
+    "name": "arcanai",
+    "version": "0.1.0",
+    "description": "A TypeScript CLI for drawing tarot cards and interpreting them with an LLM.",
+    "type": "module",
+    "bin": {
+        "scry": "./dist/cli.js",
+        "arcanai": "./dist/cli.js"
+    },
+    "files": [
+        "dist",
+        "!dist/**/*.test.*",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "build": "tsc -p tsconfig.json",
+        "dev": "tsx src/cli.tsx",
+        "test": "vitest run",
+        "typecheck": "tsc -p tsconfig.json --noEmit",
+        "prepack": "npm run build"
+    },
+    "keywords": [
+        "tarot",
+        "cli",
+        "ink",
+        "llm",
+        "ai",
+        "ollama",
+        "openai"
+    ],
+    "author": "itsleahxyz <me@leahfrom.de> (https://itsleah.xyz/)",
+    "license": "MIT",
+    "engines": {
+        "node": ">=24"
+    },
+    "dependencies": {
+        "@ai-sdk/openai": "^3.0.66",
+        "ai": "^6.0.191",
+        "ink": "^7.0.4",
+        "ollama-ai-provider-v2": "^3.5.1",
+        "react": "^19.2.6",
+        "zod": "^4.4.3"
+    },
+    "devDependencies": {
+        "@types/node": "^24.12.4",
+        "@types/react": "^19.2.15",
+        "tsx": "^4.22.3",
+        "typescript": "^6.0.3",
+        "vitest": "^4.1.7"
+    }
 }
