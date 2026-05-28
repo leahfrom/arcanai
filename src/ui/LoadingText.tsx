@@ -13,6 +13,13 @@ type LoadingTextProperties = {
 const frames = ["-", "\\", "|", "/"];
 const deckFrames = ["[////]", "[\\\\\\\\]", "[||||]", "[----]"];
 
+const messageIntervals: Record<LoadingTextProperties["mode"], number> = {
+  shuffling: 850,
+  dealing: 1200,
+  revealing: 1400,
+  consulting: 3200,
+};
+
 const messages: Record<LoadingTextProperties["mode"], readonly string[]> = {
   shuffling: ["Riffle shuffle", "Cutting the deck", "Squaring the edges"],
   dealing: [
@@ -59,7 +66,7 @@ export const LoadingText = ({
 
     const timer = setInterval(() => {
       setMessageIndex((previous) => previous + 1);
-    }, 3200);
+    }, messageIntervals[mode]);
 
     return () => {
       clearInterval(timer);
