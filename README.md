@@ -29,6 +29,7 @@ npm install -g github:leahfrom/arcanai
 To install a specific branch, tag, or commit, append a ref:
 
 ```sh
+npm install -g github:leahfrom/arcanai#v1.0.0
 npm install -g github:leahfrom/arcanai#main
 ```
 
