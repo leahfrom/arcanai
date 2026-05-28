@@ -6,6 +6,7 @@ import {drawCards} from './tarot/draw.js';
 import {getSpread, spreads} from './tarot/spreads.js';
 import type {DrawnCard, SpreadId} from './tarot/types.js';
 import {CardView} from './ui/CardView.js';
+import {LoadingText} from './ui/LoadingText.js';
 import {MarkdownText} from './ui/MarkdownText.js';
 import {Menu} from './ui/Menu.js';
 import {TextInput} from './ui/TextInput.js';
@@ -123,7 +124,7 @@ export const App = ({initialQuestion = '', initialSpread, provider, model, allow
       </Box>
       {!reading && !error && (
         <Box>
-          <Text color={colors.muted}>{cards.length === 0 ? 'Shuffling the deck...' : `Consulting ${providerLabel(provider)}...`}</Text>
+          <LoadingText mode={cards.length === 0 ? 'shuffling' : 'consulting'} />
         </Box>
       )}
       {error && (
@@ -154,15 +155,3 @@ const Frame = ({children, eyebrow}: {readonly children: React.ReactNode; readonl
     {children}
   </Box>
 );
-
-const providerLabel = (provider: ProviderId): string => {
-  if (provider === 'auto') {
-    return 'the first available LLM';
-  }
-
-  if (provider === 'none') {
-    return 'the local fallback';
-  }
-
-  return provider;
-};
