@@ -6,6 +6,7 @@ import {drawCards} from './tarot/draw.js';
 import {getSpread, spreads} from './tarot/spreads.js';
 import type {DrawnCard, SpreadId} from './tarot/types.js';
 import {CardView} from './ui/CardView.js';
+import {MarkdownText} from './ui/MarkdownText.js';
 import {Menu} from './ui/Menu.js';
 import {TextInput} from './ui/TextInput.js';
 
@@ -123,7 +124,7 @@ export const App = ({initialQuestion = '', initialSpread, provider, model, allow
         <Box flexDirection="column">
           <Text color="gray">Provider: {reading.provider}{reading.model ? ` / ${reading.model}` : ''}{reading.usedFallback ? ' / fallback' : ''}</Text>
           <Newline />
-          <Text>{reading.text}</Text>
+          <MarkdownText>{reading.text}</MarkdownText>
         </Box>
       )}
     </Frame>
