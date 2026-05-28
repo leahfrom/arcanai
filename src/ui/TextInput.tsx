@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {Box, Text, useInput} from 'ink';
+import {colors, tarotMarks} from './theme.js';
 
 type TextInputProperties = {
   readonly label: string;
@@ -32,12 +33,18 @@ export const TextInput = ({label, placeholder, onSubmit}: TextInputProperties) =
 
   return (
     <Box flexDirection="column">
-      <Text color="cyan">{label}</Text>
       <Text>
-        <Text color="gray">{'> '}</Text>
-        {value.length > 0 ? value : <Text color="gray">{placeholder}</Text>}
+        <Text color={colors.text} bold>{label}</Text>
       </Text>
-      <Text color="gray">Press Enter to continue.</Text>
+      <Box marginTop={1}>
+        <Text>
+          <Text color={colors.accent}>{tarotMarks.prompt} </Text>
+          {value.length > 0 ? <Text color={colors.text}>{value}</Text> : <Text color={colors.muted}>{placeholder}</Text>}
+        </Text>
+      </Box>
+      <Box marginTop={1}>
+        <Text color={colors.muted}>Enter continues. Empty question opens a general reading.</Text>
+      </Box>
     </Box>
   );
 };

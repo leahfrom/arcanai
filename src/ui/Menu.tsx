@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {Box, Text, useInput} from 'ink';
+import {colors, tarotMarks} from './theme.js';
 
 type MenuItem<T extends string> = {
   readonly value: T;
@@ -34,15 +35,24 @@ export const Menu = <T extends string>({title, items, onSubmit}: MenuProperties<
 
   return (
     <Box flexDirection="column">
-      <Text color="cyan">{title}</Text>
+      <Text>
+        <Text color={colors.text} bold>{title}</Text>
+      </Text>
       {items.map((item, itemIndex) => (
-        <Text key={item.value} color={itemIndex === index ? 'magenta' : undefined}>
-          {itemIndex === index ? '> ' : '  '}
-          <Text bold={itemIndex === index}>{item.label}</Text>
-          <Text color="gray"> - {item.hint}</Text>
-        </Text>
+        <Box key={item.value} flexDirection="column" marginTop={1}>
+          <Text>
+            <Text color={itemIndex === index ? colors.accent : colors.muted}>
+              {itemIndex === index ? tarotMarks.prompt : '  '}
+              {' '}
+            </Text>
+            <Text bold={itemIndex === index} color={itemIndex === index ? colors.text : undefined}>{item.label}</Text>
+          </Text>
+          {itemIndex === index && <Text color={colors.muted}>   {item.hint}</Text>}
+        </Box>
       ))}
-      <Text color="gray">Use arrow keys, then Enter.</Text>
+      <Box marginTop={1}>
+        <Text color={colors.muted}>Use arrow keys, then Enter.</Text>
+      </Box>
     </Box>
   );
 };

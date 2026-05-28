@@ -9,6 +9,7 @@ import {CardView} from './ui/CardView.js';
 import {MarkdownText} from './ui/MarkdownText.js';
 import {Menu} from './ui/Menu.js';
 import {TextInput} from './ui/TextInput.js';
+import {colors} from './ui/theme.js';
 
 type Phase = 'question' | 'spread' | 'reading';
 
@@ -77,7 +78,7 @@ export const App = ({initialQuestion = '', initialSpread, provider, model, allow
 
   if (phase === 'question') {
     return (
-      <Frame>
+      <Frame eyebrow="question">
         <TextInput
           label="What are we scrying into?"
           placeholder="Ask a question, or press Enter for a general reading"
@@ -92,7 +93,7 @@ export const App = ({initialQuestion = '', initialSpread, provider, model, allow
 
   if (phase === 'spread') {
     return (
-      <Frame>
+      <Frame eyebrow="spread">
         <Menu
           title="Choose a spread"
           items={spreads.map(spreadOption => ({
@@ -110,19 +111,29 @@ export const App = ({initialQuestion = '', initialSpread, provider, model, allow
   }
 
   return (
-    <Frame>
-      <Text color="cyan" bold>{spread.label}</Text>
-      <Text color="gray">{question || 'General reading'}</Text>
+    <Frame eyebrow="reading">
+      <Box flexDirection="column" marginBottom={1}>
+        <Text color={colors.text} bold>{spread.label}</Text>
+        <Text color={colors.muted}>{question || 'General reading'}</Text>
+      </Box>
       <Box gap={1} flexWrap="wrap" marginY={1}>
         {cards.map(card => (
           <CardView key={`${card.position}:${card.name}`} card={card} />
         ))}
       </Box>
-      {!reading && !error && <Text color="gray">Consulting {provider === 'auto' ? 'the first available LLM' : provider}...</Text>}
-      {error && <Text color="red">{error}</Text>}
+      {!reading && !error && (
+        <Box>
+          <Text color={colors.muted}>{cards.length === 0 ? 'Shuffling the deck...' : `Consulting ${providerLabel(provider)}...`}</Text>
+        </Box>
+      )}
+      {error && (
+        <Box>
+          <Text color={colors.danger}>{error}</Text>
+        </Box>
+      )}
       {reading && (
-        <Box flexDirection="column">
-          <Text color="gray">Provider: {reading.provider}{reading.model ? ` / ${reading.model}` : ''}{reading.usedFallback ? ' / fallback' : ''}</Text>
+        <Box flexDirection="column" borderStyle="round" borderColor={colors.accent} paddingX={1} paddingY={1}>
+          <Text color={colors.muted}>Provider: {reading.provider}{reading.model ? ` / ${reading.model}` : ''}{reading.usedFallback ? ' / fallback' : ''}</Text>
           <Newline />
           <MarkdownText>{reading.text}</MarkdownText>
         </Box>
@@ -131,11 +142,27 @@ export const App = ({initialQuestion = '', initialSpread, provider, model, allow
   );
 };
 
-const Frame = ({children}: {readonly children: React.ReactNode}) => (
+const Frame = ({children, eyebrow}: {readonly children: React.ReactNode; readonly eyebrow: string}) => (
   <Box flexDirection="column" paddingX={1} paddingY={1}>
-    <Text color="magenta" bold>arcanai</Text>
-    <Text color="gray">terminal tarot with an optional LLM reading</Text>
-    <Newline />
+    <Box flexDirection="column" marginBottom={1}>
+      <Text>
+        <Text color={colors.accent}>* </Text>
+        <Text color={colors.text} bold>ARCANAI</Text>
+        <Text color={colors.muted}> {eyebrow}</Text>
+      </Text>
+    </Box>
     {children}
   </Box>
 );
+
+const providerLabel = (provider: ProviderId): string => {
+  if (provider === 'auto') {
+    return 'the first available LLM';
+  }
+
+  if (provider === 'none') {
+    return 'the local fallback';
+  }
+
+  return provider;
+};

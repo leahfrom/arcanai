@@ -1,5 +1,6 @@
 import React from 'react';
 import {Box, Text} from 'ink';
+import {colors, tarotMarks} from './theme.js';
 
 type InlineToken = {
   readonly text: string;
@@ -32,8 +33,8 @@ export const MarkdownText = ({children}: MarkdownTextProperties) => {
     const heading = line.match(/^#{1,6}\s+(.+)$/);
     if (heading) {
       nodes.push(
-        <Text key={`heading:${index}`} color="cyan" bold>
-          {stripWrappingBold(heading[1])}
+        <Text key={`heading:${index}`} color={colors.accent} bold>
+          {tarotMarks.divider} {stripWrappingBold(heading[1])}
         </Text>
       );
       return;
@@ -42,8 +43,8 @@ export const MarkdownText = ({children}: MarkdownTextProperties) => {
     const boldHeading = line.trim().match(/^\*\*(.+)\*\*$/);
     if (boldHeading) {
       nodes.push(
-        <Text key={`bold-heading:${index}`} color="cyan" bold>
-          {boldHeading[1]}
+        <Text key={`bold-heading:${index}`} color={colors.accent} bold>
+          {tarotMarks.divider} {boldHeading[1]}
         </Text>
       );
       return;
@@ -53,7 +54,7 @@ export const MarkdownText = ({children}: MarkdownTextProperties) => {
     if (listItem) {
       nodes.push(
         <Box key={`list:${index}`} paddingLeft={Math.floor(listItem[1].length / 2)}>
-          <Text color="gray">- </Text>
+          <Text color={colors.alternate}>- </Text>
           <Text>{renderInline(listItem[2], index)}</Text>
         </Box>
       );
@@ -88,7 +89,7 @@ const renderInline = (value: string, lineIndex: number) => (
     }
 
     if (token.kind === 'code') {
-      return <Text key={key} color="yellow">{token.text}</Text>;
+      return <Text key={key} color={colors.accent}>{token.text}</Text>;
     }
 
     return token.text;
