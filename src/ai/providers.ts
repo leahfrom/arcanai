@@ -10,7 +10,7 @@ const openAiProvider: AiProvider = {
   label: 'OpenAI',
   isAvailable: () => Boolean(process.env.OPENAI_API_KEY),
   async read(request: ReadingRequest): Promise<ReadingResponse> {
-    const model = request.model ?? process.env.OPENAI_MODEL ?? 'gpt-4.1-mini';
+    const model = request.model ?? process.env.OPENAI_MODEL ?? 'gpt-5.5';
     const result = await generateText({
       model: openai(model),
       prompt: buildReadingPrompt(request),

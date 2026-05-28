@@ -46,7 +46,7 @@ scry --no-interactive --json --provider none
 Provider examples:
 
 ```sh
-OPENAI_API_KEY=... scry --provider openai --model gpt-4.1-mini
+OPENAI_API_KEY=... scry --provider openai --model gpt-5.5
 scry --provider ollama --model llama3.2
 scry --provider none
 ```
@@ -55,7 +55,7 @@ Useful environment variables:
 
 ```sh
 OPENAI_API_KEY=...
-OPENAI_MODEL=gpt-4.1-mini
+OPENAI_MODEL=gpt-5.5
 OLLAMA_HOST=http://127.0.0.1:11434/api
 ARCANAI_OLLAMA_MODEL=llama3.2
 ```
