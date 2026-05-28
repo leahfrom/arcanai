@@ -37,10 +37,10 @@ scry --no-interactive --json --provider none
 
 ## AI providers
 
-`arcanai` uses `--provider auto` by default.
+`arcanai` uses the AI SDK for provider calls and `--provider auto` by default.
 
 - If `OPENAI_API_KEY` is set, it tries OpenAI first.
-- It then tries Ollama at `OLLAMA_HOST` or `http://127.0.0.1:11434`.
+- It then tries Ollama at `OLLAMA_HOST` or `http://127.0.0.1:11434/api`.
 - If no provider responds, it prints a local symbolic fallback reading.
 
 Provider examples:
@@ -56,7 +56,7 @@ Useful environment variables:
 ```sh
 OPENAI_API_KEY=...
 OPENAI_MODEL=gpt-4.1-mini
-OLLAMA_HOST=http://127.0.0.1:11434
+OLLAMA_HOST=http://127.0.0.1:11434/api
 ARCANAI_OLLAMA_MODEL=llama3.2
 ```
 
