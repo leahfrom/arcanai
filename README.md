@@ -23,14 +23,14 @@ A TypeScript terminal tarot CLI for drawing cards, exploring spreads, and option
 ## Install
 
 ```sh
-npm install -g github:leahfrom/arcanai
+npm install -g https://github.com/leahfrom/arcanai/releases/download/v1.0.1/arcanai-1.0.1.tgz
 ```
 
-To install a specific branch, tag, or commit, append a ref:
+Or install from the latest release asset on GitHub:
 
 ```sh
-npm install -g github:leahfrom/arcanai#v1.0.0
-npm install -g github:leahfrom/arcanai#main
+gh release download v1.0.1 --repo leahfrom/arcanai --pattern "arcanai-*.tgz"
+npm install -g ./arcanai-1.0.1.tgz
 ```
 
 The package installs two equivalent command names:
