@@ -1,9 +1,9 @@
-import {parseArgs} from 'node:util';
-import {readFileSync} from 'node:fs';
-import {dirname, join} from 'node:path';
-import {fileURLToPath} from 'node:url';
-import type {ProviderId} from './ai/types.js';
-import type {SpreadId} from './tarot/types.js';
+import { parseArgs } from "node:util";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import type { ProviderId } from "./ai/types.js";
+import type { SpreadId } from "./tarot/types.js";
 
 export type CliOptions = {
   readonly help: boolean;
@@ -17,8 +17,13 @@ export type CliOptions = {
   readonly allowReversed: boolean;
 };
 
-const validSpreads = new Set<SpreadId>(['single', 'three', 'cross']);
-const validProviders = new Set<ProviderId>(['auto', 'openai', 'ollama', 'none']);
+const validSpreads = new Set<SpreadId>(["single", "three", "cross"]);
+const validProviders = new Set<ProviderId>([
+  "auto",
+  "openai",
+  "ollama",
+  "none",
+]);
 
 export const helpText = `Arcanai
 
@@ -48,51 +53,62 @@ Environment
 
 export const getVersion = (): string => {
   const directory = dirname(fileURLToPath(import.meta.url));
-  const packageJson = JSON.parse(readFileSync(join(directory, '..', 'package.json'), 'utf8')) as {version?: unknown};
+  const packageJson = JSON.parse(
+    readFileSync(join(directory, "..", "package.json"), "utf8"),
+  ) as { version?: unknown };
 
-  return typeof packageJson.version === 'string' ? packageJson.version : '0.0.0';
+  return typeof packageJson.version === "string"
+    ? packageJson.version
+    : "0.0.0";
 };
 
 export const parseCliOptions = (argv: readonly string[]): CliOptions => {
-  const normalized = argv[0] === 'draw' ? argv.slice(1) : argv;
-  const {values} = parseArgs({
+  const normalized = argv[0] === "draw" ? argv.slice(1) : argv;
+  const { values } = parseArgs({
     args: [...normalized],
     allowPositionals: true,
     options: {
-      question: {type: 'string', short: 'q'},
-      spread: {type: 'string', short: 's', default: 'three'},
-      provider: {type: 'string', short: 'p', default: 'auto'},
-      model: {type: 'string', short: 'm'},
-      json: {type: 'boolean', default: false},
-      interactive: {type: 'boolean', default: true},
-      'no-interactive': {type: 'boolean', default: false},
-      reversed: {type: 'boolean', default: true},
-      'no-reversed': {type: 'boolean', default: false},
-      help: {type: 'boolean', short: 'h', default: false},
-      version: {type: 'boolean', short: 'v', default: false}
-    }
+      question: { type: "string", short: "q" },
+      spread: { type: "string", short: "s", default: "three" },
+      provider: { type: "string", short: "p", default: "auto" },
+      model: { type: "string", short: "m" },
+      json: { type: "boolean", default: false },
+      interactive: { type: "boolean", default: true },
+      "no-interactive": { type: "boolean", default: false },
+      reversed: { type: "boolean", default: true },
+      "no-reversed": { type: "boolean", default: false },
+      help: { type: "boolean", short: "h", default: false },
+      version: { type: "boolean", short: "v", default: false },
+    },
   });
 
   const spread = values.spread;
   const provider = values.provider;
 
-  if (typeof spread !== 'string' || !validSpreads.has(spread as SpreadId)) {
-    throw new Error(`Invalid spread "${String(spread)}". Expected single, three, or cross.`);
+  if (typeof spread !== "string" || !validSpreads.has(spread as SpreadId)) {
+    throw new Error(
+      `Invalid spread "${String(spread)}". Expected single, three, or cross.`,
+    );
   }
 
-  if (typeof provider !== 'string' || !validProviders.has(provider as ProviderId)) {
-    throw new Error(`Invalid provider "${String(provider)}". Expected auto, openai, ollama, or none.`);
+  if (
+    typeof provider !== "string" ||
+    !validProviders.has(provider as ProviderId)
+  ) {
+    throw new Error(
+      `Invalid provider "${String(provider)}". Expected auto, openai, ollama, or none.`,
+    );
   }
 
   return {
     help: Boolean(values.help),
     version: Boolean(values.version),
     json: Boolean(values.json),
-    interactive: Boolean(values.interactive) && !values['no-interactive'],
-    question: typeof values.question === 'string' ? values.question : '',
+    interactive: Boolean(values.interactive) && !values["no-interactive"],
+    question: typeof values.question === "string" ? values.question : "",
     spread: spread as SpreadId,
     provider: provider as ProviderId,
-    model: typeof values.model === 'string' ? values.model : undefined,
-    allowReversed: Boolean(values.reversed) && !values['no-reversed']
+    model: typeof values.model === "string" ? values.model : undefined,
+    allowReversed: Boolean(values.reversed) && !values["no-reversed"],
   };
 };

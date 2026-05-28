@@ -1,18 +1,18 @@
-import React, {useEffect, useMemo, useState} from 'react';
-import {Box, Newline, Text, useApp} from 'ink';
-import {readWithAi} from './ai/providers.js';
-import type {ProviderId, ReadingResponse} from './ai/types.js';
-import {drawCards} from './tarot/draw.js';
-import {getSpread, spreads} from './tarot/spreads.js';
-import type {DrawnCard, SpreadId} from './tarot/types.js';
-import {CardView} from './ui/CardView.js';
-import {LoadingText} from './ui/LoadingText.js';
-import {MarkdownText} from './ui/MarkdownText.js';
-import {Menu} from './ui/Menu.js';
-import {TextInput} from './ui/TextInput.js';
-import {colors} from './ui/theme.js';
+import React, { useEffect, useMemo, useState } from "react";
+import { Box, Newline, Text, useApp } from "ink";
+import { readWithAi } from "./ai/providers.js";
+import type { ProviderId, ReadingResponse } from "./ai/types.js";
+import { drawCards } from "./tarot/draw.js";
+import { getSpread, spreads } from "./tarot/spreads.js";
+import type { DrawnCard, SpreadId } from "./tarot/types.js";
+import { CardView } from "./ui/CardView.js";
+import { LoadingText } from "./ui/LoadingText.js";
+import { MarkdownText } from "./ui/MarkdownText.js";
+import { Menu } from "./ui/Menu.js";
+import { TextInput } from "./ui/TextInput.js";
+import { colors } from "./ui/theme.js";
 
-type Phase = 'question' | 'spread' | 'reading';
+type Phase = "question" | "spread" | "reading";
 
 type AppProperties = {
   readonly initialQuestion?: string;
@@ -22,39 +22,53 @@ type AppProperties = {
   readonly allowReversed: boolean;
 };
 
-export const App = ({initialQuestion = '', initialSpread, provider, model, allowReversed}: AppProperties) => {
-  const {exit} = useApp();
-  const [phase, setPhase] = useState<Phase>(initialQuestion && initialSpread ? 'reading' : initialQuestion ? 'spread' : 'question');
+export const App = ({
+  initialQuestion = "",
+  initialSpread,
+  provider,
+  model,
+  allowReversed,
+}: AppProperties) => {
+  const { exit } = useApp();
+  const [phase, setPhase] = useState<Phase>(
+    initialQuestion && initialSpread
+      ? "reading"
+      : initialQuestion
+        ? "spread"
+        : "question",
+  );
   const [question, setQuestion] = useState(initialQuestion);
-  const [spreadId, setSpreadId] = useState<SpreadId>(initialSpread ?? 'three');
+  const [spreadId, setSpreadId] = useState<SpreadId>(initialSpread ?? "three");
   const [cards, setCards] = useState<readonly DrawnCard[]>([]);
   const [reading, setReading] = useState<ReadingResponse | undefined>();
   const [error, setError] = useState<string | undefined>();
   const spread = useMemo(() => getSpread(spreadId), [spreadId]);
 
   useEffect(() => {
-    if (phase !== 'reading' || cards.length > 0) {
+    if (phase !== "reading" || cards.length > 0) {
       return;
     }
 
-    setCards(drawCards({spread: spreadId, allowReversed}));
+    setCards(drawCards({ spread: spreadId, allowReversed }));
   }, [allowReversed, cards.length, phase, spreadId]);
 
   useEffect(() => {
-    if (phase !== 'reading' || cards.length === 0 || reading || error) {
+    if (phase !== "reading" || cards.length === 0 || reading || error) {
       return;
     }
 
     let isMounted = true;
-    readWithAi(provider, {question, spread, cards, model})
-      .then(response => {
+    readWithAi(provider, { question, spread, cards, model })
+      .then((response) => {
         if (isMounted) {
           setReading(response);
         }
       })
-      .catch(caught => {
+      .catch((caught) => {
         if (isMounted) {
-          setError(caught instanceof Error ? caught.message : 'The reading failed.');
+          setError(
+            caught instanceof Error ? caught.message : "The reading failed.",
+          );
         }
       });
 
@@ -77,34 +91,34 @@ export const App = ({initialQuestion = '', initialSpread, provider, model, allow
     return undefined;
   }, [error, exit, reading]);
 
-  if (phase === 'question') {
+  if (phase === "question") {
     return (
       <Frame eyebrow="question">
         <TextInput
           label="What are we scrying into?"
           placeholder="Ask a question, or press Enter for a general reading"
-          onSubmit={value => {
+          onSubmit={(value) => {
             setQuestion(value);
-            setPhase('spread');
+            setPhase("spread");
           }}
         />
       </Frame>
     );
   }
 
-  if (phase === 'spread') {
+  if (phase === "spread") {
     return (
       <Frame eyebrow="spread">
         <Menu
           title="Choose a spread"
-          items={spreads.map(spreadOption => ({
+          items={spreads.map((spreadOption) => ({
             value: spreadOption.id,
             label: spreadOption.label,
-            hint: spreadOption.description
+            hint: spreadOption.description,
           }))}
-          onSubmit={value => {
+          onSubmit={(value) => {
             setSpreadId(value);
-            setPhase('reading');
+            setPhase("reading");
           }}
         />
       </Frame>
@@ -114,17 +128,19 @@ export const App = ({initialQuestion = '', initialSpread, provider, model, allow
   return (
     <Frame eyebrow="reading">
       <Box flexDirection="column" marginBottom={1}>
-        <Text color={colors.text} bold>{spread.label}</Text>
-        <Text color={colors.muted}>{question || 'General reading'}</Text>
+        <Text color={colors.text} bold>
+          {spread.label}
+        </Text>
+        <Text color={colors.muted}>{question || "General reading"}</Text>
       </Box>
       <Box gap={1} flexWrap="wrap" marginY={1}>
-        {cards.map(card => (
+        {cards.map((card) => (
           <CardView key={`${card.position}:${card.name}`} card={card} />
         ))}
       </Box>
       {!reading && !error && (
         <Box>
-          <LoadingText mode={cards.length === 0 ? 'shuffling' : 'consulting'} />
+          <LoadingText mode={cards.length === 0 ? "shuffling" : "consulting"} />
         </Box>
       )}
       {error && (
@@ -133,8 +149,18 @@ export const App = ({initialQuestion = '', initialSpread, provider, model, allow
         </Box>
       )}
       {reading && (
-        <Box flexDirection="column" borderStyle="round" borderColor={colors.accent} paddingX={1} paddingY={1}>
-          <Text color={colors.muted}>Provider: {reading.provider}{reading.model ? ` / ${reading.model}` : ''}{reading.usedFallback ? ' / fallback' : ''}</Text>
+        <Box
+          flexDirection="column"
+          borderStyle="round"
+          borderColor={colors.accent}
+          paddingX={1}
+          paddingY={1}
+        >
+          <Text color={colors.muted}>
+            Provider: {reading.provider}
+            {reading.model ? ` / ${reading.model}` : ""}
+            {reading.usedFallback ? " / fallback" : ""}
+          </Text>
           <Newline />
           <MarkdownText>{reading.text}</MarkdownText>
         </Box>
@@ -143,12 +169,20 @@ export const App = ({initialQuestion = '', initialSpread, provider, model, allow
   );
 };
 
-const Frame = ({children, eyebrow}: {readonly children: React.ReactNode; readonly eyebrow: string}) => (
+const Frame = ({
+  children,
+  eyebrow,
+}: {
+  readonly children: React.ReactNode;
+  readonly eyebrow: string;
+}) => (
   <Box flexDirection="column" paddingX={1} paddingY={1}>
     <Box flexDirection="column" marginBottom={1}>
       <Text>
         <Text color={colors.accent}>* </Text>
-        <Text color={colors.text} bold>ARCANAI</Text>
+        <Text color={colors.text} bold>
+          ARCANAI
+        </Text>
         <Text color={colors.muted}> {eyebrow}</Text>
       </Text>
     </Box>

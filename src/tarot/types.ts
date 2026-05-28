@@ -1,6 +1,6 @@
-export type Arcana = 'major' | 'minor';
+export type Arcana = "major" | "minor";
 
-export type Suit = 'cups' | 'pentacles' | 'swords' | 'wands';
+export type Suit = "cups" | "pentacles" | "swords" | "wands";
 
 export type Card = {
   readonly name: string;
@@ -16,7 +16,7 @@ export type DrawnCard = Card & {
   readonly position: string;
 };
 
-export type SpreadId = 'single' | 'three' | 'cross';
+export type SpreadId = "single" | "three" | "cross";
 
 export type Spread = {
   readonly id: SpreadId;

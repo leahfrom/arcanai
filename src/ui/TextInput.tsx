@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
-import {Box, Text, useInput} from 'ink';
-import {colors, tarotMarks} from './theme.js';
+import React, { useState } from "react";
+import { Box, Text, useInput } from "ink";
+import { colors, tarotMarks } from "./theme.js";
 
 type TextInputProperties = {
   readonly label: string;
@@ -8,8 +8,12 @@ type TextInputProperties = {
   readonly onSubmit: (value: string) => void;
 };
 
-export const TextInput = ({label, placeholder, onSubmit}: TextInputProperties) => {
-  const [value, setValue] = useState('');
+export const TextInput = ({
+  label,
+  placeholder,
+  onSubmit,
+}: TextInputProperties) => {
+  const [value, setValue] = useState("");
 
   useInput((input, key) => {
     if (key.return) {
@@ -18,7 +22,7 @@ export const TextInput = ({label, placeholder, onSubmit}: TextInputProperties) =
     }
 
     if (key.backspace || key.delete) {
-      setValue(previous => previous.slice(0, -1));
+      setValue((previous) => previous.slice(0, -1));
       return;
     }
 
@@ -27,23 +31,31 @@ export const TextInput = ({label, placeholder, onSubmit}: TextInputProperties) =
     }
 
     if (input) {
-      setValue(previous => `${previous}${input}`);
+      setValue((previous) => `${previous}${input}`);
     }
   });
 
   return (
     <Box flexDirection="column">
       <Text>
-        <Text color={colors.text} bold>{label}</Text>
+        <Text color={colors.text} bold>
+          {label}
+        </Text>
       </Text>
       <Box marginTop={1}>
         <Text>
           <Text color={colors.accent}>{tarotMarks.prompt} </Text>
-          {value.length > 0 ? <Text color={colors.text}>{value}</Text> : <Text color={colors.muted}>{placeholder}</Text>}
+          {value.length > 0 ? (
+            <Text color={colors.text}>{value}</Text>
+          ) : (
+            <Text color={colors.muted}>{placeholder}</Text>
+          )}
         </Text>
       </Box>
       <Box marginTop={1}>
-        <Text color={colors.muted}>Enter continues. Empty question opens a general reading.</Text>
+        <Text color={colors.muted}>
+          Enter continues. Empty question opens a general reading.
+        </Text>
       </Box>
     </Box>
   );

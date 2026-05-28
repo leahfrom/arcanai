@@ -1,4 +1,4 @@
-import type {DrawnCard, Spread} from '../tarot/types.js';
+import type { DrawnCard, Spread } from "../tarot/types.js";
 
 export type ReadingRequest = {
   readonly question: string;
@@ -21,4 +21,4 @@ export type AiProvider = {
   readonly read: (request: ReadingRequest) => Promise<ReadingResponse>;
 };
 
-export type ProviderId = 'auto' | 'openai' | 'ollama' | 'none';
+export type ProviderId = "auto" | "openai" | "ollama" | "none";
