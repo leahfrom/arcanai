@@ -23,13 +23,19 @@ A TypeScript terminal tarot CLI for drawing cards, exploring spreads, and option
 ## Install
 
 ```sh
+npm install -g https://github.com/leahfrom/arcanai/releases/latest/download/arcanai.tgz
+```
+
+To install a specific version, use that release's versioned tarball:
+
+```sh
 npm install -g https://github.com/leahfrom/arcanai/releases/download/v1.0.1/arcanai-1.0.1.tgz
 ```
 
-Or install from the latest release asset on GitHub:
+Or download the release asset with GitHub CLI:
 
 ```sh
-gh release download v1.0.1 --repo leahfrom/arcanai --pattern "arcanai-*.tgz"
+gh release download v1.0.1 --repo leahfrom/arcanai --pattern "arcanai-1.0.1.tgz"
 npm install -g ./arcanai-1.0.1.tgz
 ```
 
