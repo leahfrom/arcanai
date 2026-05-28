@@ -42,8 +42,8 @@ jobs:
       - name: Pack
         run: npm pack
 
-      - name: Add stable tarball name
-        run: cp arcanai-*.tgz arcanai.tgz
+      - name: Rename tarball
+        run: mv arcanai-*.tgz arcanai.tgz
 
       - name: Ensure release exists
         env:
@@ -55,4 +55,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.event.release.tag_name || inputs.tag }}
-        run: gh release upload "$TAG" arcanai-*.tgz arcanai.tgz --clobber
+        run: gh release upload "$TAG" arcanai.tgz --clobber
