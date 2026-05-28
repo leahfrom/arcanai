@@ -15,7 +15,7 @@ A TypeScript terminal tarot CLI for drawing cards, exploring spreads, and option
 
 ## Requirements
 
-- Node.js 20 or newer
+- Node.js 24 or newer
 - Optional: an `OPENAI_API_KEY` for OpenAI readings
 - Optional: a running Ollama server for local model readings
 
