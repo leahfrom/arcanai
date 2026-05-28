@@ -40,6 +40,11 @@ Start the interactive UI:
 scry
 ```
 
+Type a question and press Enter to begin a three-card reading. Press Tab before
+submitting to cycle through the single-card and five-card cross spreads. The
+deck shuffles briefly, then reveals each drawn card before the interpretation
+begins.
+
 Run a one-shot reading:
 
 ```sh

@@ -9,6 +9,11 @@ type CardViewProperties = {
   readonly width?: number;
 };
 
+type CardBackViewProperties = {
+  readonly position: string;
+  readonly width?: number;
+};
+
 export const CardView = ({ card, width = 26 }: CardViewProperties) => {
   const keywords = card.reversed ? card.reversedKeywords : card.keywords;
   const orientation = card.reversed ? "reversed" : "upright";
@@ -42,3 +47,22 @@ export const CardView = ({ card, width = 26 }: CardViewProperties) => {
     </Box>
   );
 };
+
+export const CardBackView = ({
+  position,
+  width = 26,
+}: CardBackViewProperties) => (
+  <Box
+    borderStyle="single"
+    borderColor={colors.muted}
+    paddingX={1}
+    width={width}
+    flexDirection="column"
+  >
+    <Text color={colors.muted}>{position}</Text>
+    <Text color={colors.accent}>////////////////</Text>
+    <Text color={colors.accent}>\\\\\\\\\\\\\\\\</Text>
+    <Text color={colors.muted}>face down</Text>
+    <Text color={colors.muted}>awaiting reveal</Text>
+  </Box>
+);

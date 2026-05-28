@@ -32,7 +32,7 @@ const main = async (): Promise<void> => {
   const instance = render(
     <App
       initialQuestion={options.question}
-      initialSpread={options.question ? options.spread : undefined}
+      initialSpread={options.spread}
       provider={options.provider}
       model={options.model}
       allowReversed={options.allowReversed}

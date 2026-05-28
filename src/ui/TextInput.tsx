@@ -5,19 +5,35 @@ import { colors, tarotMarks } from "./theme.js";
 type TextInputProperties = {
   readonly label: string;
   readonly placeholder: string;
+  readonly hint: string;
+  readonly children?: React.ReactNode;
+  readonly onAlternate?: () => void;
   readonly onSubmit: (value: string) => void;
 };
 
 export const TextInput = ({
+  children,
+  hint,
   label,
+  onAlternate,
   placeholder,
   onSubmit,
 }: TextInputProperties) => {
   const [value, setValue] = useState("");
 
   useInput((input, key) => {
-    if (key.return) {
-      onSubmit(value.trim());
+    const returnIndex = input.search(/[\r\n]/);
+
+    if (key.return || returnIndex !== -1) {
+      const submittedInput =
+        returnIndex === -1 ? "" : input.slice(0, returnIndex);
+
+      onSubmit(`${value}${submittedInput}`.trim());
+      return;
+    }
+
+    if (key.tab || input === "\t") {
+      onAlternate?.();
       return;
     }
 
@@ -53,10 +69,9 @@ export const TextInput = ({
         </Text>
       </Box>
       <Box marginTop={1}>
-        <Text color={colors.muted}>
-          Enter continues. Empty question opens a general reading.
-        </Text>
+        <Text color={colors.muted}>{hint}</Text>
       </Box>
+      {children}
     </Box>
   );
 };
