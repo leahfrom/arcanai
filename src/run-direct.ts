@@ -1,21 +1,31 @@
 import { readWithAi } from "./ai/providers.js";
 import { formatCard } from "./format.js";
 import type { CliOptions } from "./cli-options.js";
+import type { AiConfig } from "./config.js";
 import { drawCards } from "./tarot/draw.js";
 import { getSpread } from "./tarot/spreads.js";
 
-export const runDirect = async (options: CliOptions): Promise<void> => {
+type DirectOptions = Omit<CliOptions, "configCommand" | "provider"> & {
+  readonly provider: NonNullable<CliOptions["provider"]>;
+  readonly aiConfig: AiConfig;
+};
+
+export const runDirect = async (options: DirectOptions): Promise<void> => {
   const spread = getSpread(options.spread);
   const cards = drawCards({
     spread: options.spread,
     allowReversed: options.allowReversed,
   });
-  const reading = await readWithAi(options.provider, {
-    question: options.question,
-    spread,
-    cards,
-    model: options.model,
-  });
+  const reading = await readWithAi(
+    options.provider,
+    {
+      question: options.question,
+      spread,
+      cards,
+      model: options.model,
+    },
+    options.aiConfig,
+  );
 
   if (options.json) {
     console.log(

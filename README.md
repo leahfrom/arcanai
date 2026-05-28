@@ -16,7 +16,7 @@ A TypeScript terminal tarot CLI for drawing cards, exploring spreads, and option
 ## Requirements
 
 - Node.js 24 or newer
-- Optional: an `OPENAI_API_KEY` for OpenAI readings
+- Optional: an OpenAI API key for OpenAI readings
 - Optional: a running Ollama server for local model readings
 
 ## Install
@@ -71,10 +71,29 @@ By default, `arcanai` uses `--provider auto`:
 - It then tries Ollama at `OLLAMA_HOST` or `http://127.0.0.1:11434/api`.
 - If no provider responds, it prints a local symbolic fallback reading.
 
+You can configure provider defaults once instead of prefixing every command with
+environment variables:
+
+```sh
+scry config set openai.apiKey sk-...
+scry config set openai.model gpt-5.5
+scry config set ollama.model llama3.2
+```
+
+Config is stored at `${XDG_CONFIG_HOME:-~/.config}/arcanai/config.json`, or at
+`ARCANAI_CONFIG` when that environment variable is set. `scry config show`
+redacts secrets by default; use `scry config path` to print the active path.
+
+Config values use this precedence:
+
+```text
+CLI flags > environment variables > config file > defaults
+```
+
 Provider examples:
 
 ```sh
-OPENAI_API_KEY=... scry --provider openai --model gpt-5.5
+scry --provider openai --model gpt-5.5
 scry --provider ollama --model llama3.2
 scry --provider none
 ```
@@ -82,10 +101,24 @@ scry --provider none
 Useful environment variables:
 
 ```sh
+ARCANAI_CONFIG=~/.config/arcanai/config.json
+ARCANAI_PROVIDER=auto
 OPENAI_API_KEY=...
 OPENAI_MODEL=gpt-5.5
+OPENAI_BASE_URL=https://api.openai.com/v1
 OLLAMA_HOST=http://127.0.0.1:11434/api
 ARCANAI_OLLAMA_MODEL=llama3.2
+```
+
+Useful config keys:
+
+```text
+provider
+openai.apiKey
+openai.baseUrl
+openai.model
+ollama.baseUrl
+ollama.model
 ```
 
 ## CLI Options

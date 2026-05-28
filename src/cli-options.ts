@@ -3,7 +3,18 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { ProviderId } from "./ai/types.js";
+import type { ConfigKey } from "./config.js";
 import type { SpreadId } from "./tarot/types.js";
+
+export type ConfigCommand =
+  | {
+      readonly action: "show" | "path";
+    }
+  | {
+      readonly action: "set" | "unset";
+      readonly key: ConfigKey;
+      readonly value?: string;
+    };
 
 export type CliOptions = {
   readonly help: boolean;
@@ -12,9 +23,10 @@ export type CliOptions = {
   readonly interactive: boolean;
   readonly question: string;
   readonly spread: SpreadId;
-  readonly provider: ProviderId;
+  readonly provider?: ProviderId;
   readonly model?: string;
   readonly allowReversed: boolean;
+  readonly configCommand?: ConfigCommand;
 };
 
 const validSpreads = new Set<SpreadId>(["single", "three", "cross"]);
@@ -32,6 +44,10 @@ Draw tarot cards and ask an LLM to interpret the spread.
 Usage
   scry [options]
   arcanai [options]
+  scry config show
+  scry config path
+  scry config set <key> <value>
+  scry config unset <key>
 
 Options
   -q, --question <text>      Question or theme for the reading
@@ -45,10 +61,21 @@ Options
   -v, --version              Show version
 
 Environment
+  ARCANAI_CONFIG           Config path override
+  ARCANAI_PROVIDER         Default provider: auto, openai, ollama, none
   OPENAI_API_KEY             Enables the OpenAI provider
   OPENAI_MODEL               Default OpenAI model override
+  OPENAI_BASE_URL            OpenAI-compatible API base URL
   OLLAMA_HOST                Ollama host, default http://127.0.0.1:11434
   ARCANAI_OLLAMA_MODEL       Default Ollama model override
+
+Config keys
+  provider
+  openai.apiKey
+  openai.baseUrl
+  openai.model
+  ollama.baseUrl
+  ollama.model
 `;
 
 export const getVersion = (): string => {
@@ -64,13 +91,18 @@ export const getVersion = (): string => {
 
 export const parseCliOptions = (argv: readonly string[]): CliOptions => {
   const normalized = argv[0] === "draw" ? argv.slice(1) : argv;
+
+  if (normalized[0] === "config") {
+    return parseConfigOptions(normalized.slice(1));
+  }
+
   const { values } = parseArgs({
     args: [...normalized],
     allowPositionals: true,
     options: {
       question: { type: "string", short: "q" },
       spread: { type: "string", short: "s", default: "three" },
-      provider: { type: "string", short: "p", default: "auto" },
+      provider: { type: "string", short: "p" },
       model: { type: "string", short: "m" },
       json: { type: "boolean", default: false },
       interactive: { type: "boolean", default: true },
@@ -91,8 +123,14 @@ export const parseCliOptions = (argv: readonly string[]): CliOptions => {
     );
   }
 
+  if (provider !== undefined && typeof provider !== "string") {
+    throw new Error(
+      `Invalid provider "${String(provider)}". Expected auto, openai, ollama, or none.`,
+    );
+  }
+
   if (
-    typeof provider !== "string" ||
+    typeof provider === "string" &&
     !validProviders.has(provider as ProviderId)
   ) {
     throw new Error(
@@ -107,8 +145,81 @@ export const parseCliOptions = (argv: readonly string[]): CliOptions => {
     interactive: Boolean(values.interactive) && !values["no-interactive"],
     question: typeof values.question === "string" ? values.question : "",
     spread: spread as SpreadId,
-    provider: provider as ProviderId,
+    provider:
+      typeof provider === "string" ? (provider as ProviderId) : undefined,
     model: typeof values.model === "string" ? values.model : undefined,
     allowReversed: Boolean(values.reversed) && !values["no-reversed"],
   };
+};
+
+const emptyCliOptions = ({
+  configCommand,
+  help = false,
+  json = false,
+}: {
+  readonly configCommand?: ConfigCommand;
+  readonly help?: boolean;
+  readonly json?: boolean;
+}): CliOptions => ({
+  help,
+  version: false,
+  json,
+  interactive: false,
+  question: "",
+  spread: "three",
+  provider: undefined,
+  allowReversed: true,
+  configCommand,
+});
+
+const parseConfigOptions = (argv: readonly string[]): CliOptions => {
+  const json = argv.includes("--json");
+  const args = argv.filter((arg) => arg !== "--json");
+  const action = args[0] ?? "show";
+
+  if (action === "--help" || action === "-h" || action === "help") {
+    return emptyCliOptions({ help: true });
+  }
+
+  if (action === "show" || action === "path") {
+    return emptyCliOptions({ configCommand: { action }, json });
+  }
+
+  if (action === "set") {
+    const key = args[1];
+    const value = args.slice(2).join(" ");
+
+    if (!key || !value) {
+      throw new Error("Usage: scry config set <key> <value>");
+    }
+
+    return emptyCliOptions({
+      configCommand: {
+        action,
+        key: key as ConfigKey,
+        value,
+      },
+      json,
+    });
+  }
+
+  if (action === "unset") {
+    const key = args[1];
+
+    if (!key) {
+      throw new Error("Usage: scry config unset <key>");
+    }
+
+    return emptyCliOptions({
+      configCommand: {
+        action,
+        key: key as ConfigKey,
+      },
+      json,
+    });
+  }
+
+  throw new Error(
+    `Invalid config command "${action}". Expected show, path, set, or unset.`,
+  );
 };

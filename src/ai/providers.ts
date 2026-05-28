@@ -1,6 +1,7 @@
-import { openai } from "@ai-sdk/openai";
+import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
 import { createOllama } from "ollama-ai-provider-v2";
+import { loadAiConfig, type AiConfig } from "../config.js";
 import { createFallbackReading } from "./fallback.js";
 import { buildReadingPrompt } from "./prompt.js";
 import type {
@@ -13,9 +14,16 @@ import type {
 const openAiProvider: AiProvider = {
   id: "openai",
   label: "OpenAI",
-  isAvailable: () => Boolean(process.env.OPENAI_API_KEY),
-  async read(request: ReadingRequest): Promise<ReadingResponse> {
-    const model = request.model ?? process.env.OPENAI_MODEL ?? "gpt-5.5";
+  isAvailable: (config: AiConfig) => Boolean(config.openai.apiKey),
+  async read(
+    request: ReadingRequest,
+    config: AiConfig,
+  ): Promise<ReadingResponse> {
+    const model = request.model ?? config.openai.model;
+    const openai = createOpenAI({
+      apiKey: config.openai.apiKey,
+      baseURL: config.openai.baseUrl,
+    });
     const result = await generateText({
       model: openai(model),
       prompt: buildReadingPrompt(request),
@@ -41,12 +49,13 @@ const ollamaProvider: AiProvider = {
   id: "ollama",
   label: "Ollama",
   isAvailable: () => true,
-  async read(request: ReadingRequest): Promise<ReadingResponse> {
-    const baseUrl = process.env.OLLAMA_HOST ?? "http://127.0.0.1:11434/api";
-    const model =
-      request.model ?? process.env.ARCANAI_OLLAMA_MODEL ?? "llama3.2";
+  async read(
+    request: ReadingRequest,
+    config: AiConfig,
+  ): Promise<ReadingResponse> {
+    const model = request.model ?? config.ollama.model;
     const ollama = createOllama({
-      baseURL: baseUrl,
+      baseURL: config.ollama.baseUrl,
     });
 
     const result = await generateText({
@@ -78,6 +87,7 @@ export const providers = {
 export const readWithAi = async (
   providerId: ProviderId,
   request: ReadingRequest,
+  config: AiConfig = loadAiConfig(),
 ): Promise<ReadingResponse> => {
   if (providerId === "none") {
     return createFallbackReading(request);
@@ -89,12 +99,12 @@ export const readWithAi = async (
       : [providers[providerId]];
 
   for (const provider of candidates) {
-    if (!provider.isAvailable()) {
+    if (!provider.isAvailable(config)) {
       continue;
     }
 
     try {
-      return await provider.read(request);
+      return await provider.read(request, config);
     } catch {
       continue;
     }

@@ -1,4 +1,5 @@
 import type { DrawnCard, Spread } from "../tarot/types.js";
+import type { AiConfig } from "../config.js";
 
 export type ReadingRequest = {
   readonly question: string;
@@ -17,8 +18,11 @@ export type ReadingResponse = {
 export type AiProvider = {
   readonly id: string;
   readonly label: string;
-  readonly isAvailable: () => boolean;
-  readonly read: (request: ReadingRequest) => Promise<ReadingResponse>;
+  readonly isAvailable: (config: AiConfig) => boolean;
+  readonly read: (
+    request: ReadingRequest,
+    config: AiConfig,
+  ) => Promise<ReadingResponse>;
 };
 
 export type ProviderId = "auto" | "openai" | "ollama" | "none";

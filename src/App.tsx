@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Box, Newline, Text, useApp } from "ink";
 import { readWithAi } from "./ai/providers.js";
 import type { ProviderId, ReadingResponse } from "./ai/types.js";
+import type { AiConfig } from "./config.js";
 import { drawCards } from "./tarot/draw.js";
 import { getSpread, spreads } from "./tarot/spreads.js";
 import type { DrawnCard, Spread, SpreadId } from "./tarot/types.js";
@@ -30,6 +31,7 @@ type AppProperties = {
   readonly initialSpread?: SpreadId;
   readonly provider: ProviderId;
   readonly model?: string;
+  readonly aiConfig: AiConfig;
   readonly allowReversed: boolean;
 };
 
@@ -38,6 +40,7 @@ export const App = ({
   initialSpread,
   provider,
   model,
+  aiConfig,
   allowReversed,
 }: AppProperties) => {
   const { exit } = useApp();
@@ -143,7 +146,11 @@ export const App = ({
     }
 
     let isMounted = true;
-    readWithAi(provider, { question, spread, cards: selectedCards, model })
+    readWithAi(
+      provider,
+      { question, spread, cards: selectedCards, model },
+      aiConfig,
+    )
       .then((response) => {
         if (isMounted) {
           setReading(response);
@@ -162,6 +169,7 @@ export const App = ({
     };
   }, [
     drawStage,
+    aiConfig,
     error,
     model,
     phase,
