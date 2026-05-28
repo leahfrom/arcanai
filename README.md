@@ -16,13 +16,20 @@ A TypeScript terminal tarot CLI for drawing cards, exploring spreads, and option
 ## Requirements
 
 - Node.js 24 or newer
+- Git, for installing directly from GitHub
 - Optional: an OpenAI API key for OpenAI readings
 - Optional: a running Ollama server for local model readings
 
 ## Install
 
 ```sh
-npm install -g arcanai
+npm install -g github:leahfrom/arcanai
+```
+
+To install a specific branch, tag, or commit, append a ref:
+
+```sh
+npm install -g github:leahfrom/arcanai#main
 ```
 
 The package installs two equivalent command names:

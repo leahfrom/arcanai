@@ -1,8 +1,16 @@
 {
   "name": "arcanai",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A TypeScript CLI for drawing tarot cards and interpreting them with an LLM.",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leahfrom/arcanai.git"
+  },
+  "bugs": {
+    "url": "https://github.com/leahfrom/arcanai/issues"
+  },
+  "homepage": "https://github.com/leahfrom/arcanai#readme",
   "bin": {
     "scry": "dist/cli.js",
     "arcanai": "dist/cli.js"
@@ -18,7 +26,7 @@
     "dev": "tsx src/cli.tsx",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "prepack": "npm run build"
+    "prepare": "npm run build"
   },
   "keywords": [
     "tarot",
