@@ -93,7 +93,7 @@ export const readWithAi = async (
     return createFallbackReading(request);
   }
 
-  const candidates: readonly AiProvider[] =
+  const candidates: AiProvider[] =
     providerId === "auto"
       ? [openAiProvider, ollamaProvider]
       : [providers[providerId]];

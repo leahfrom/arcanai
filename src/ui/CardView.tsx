@@ -4,17 +4,17 @@ import type { DrawnCard } from "../tarot/types.js";
 import { wrap } from "../format.js";
 import { colors, tarotMarks } from "./theme.js";
 
-type CardViewProperties = {
-  readonly card: DrawnCard;
-  readonly width?: number;
+type CardViewProps = {
+  card: DrawnCard;
+  width?: number;
 };
 
-type CardBackViewProperties = {
-  readonly position: string;
-  readonly width?: number;
+type CardBackViewProps = {
+  position: string;
+  width?: number;
 };
 
-export const CardView = ({ card, width = 26 }: CardViewProperties) => {
+export const CardView = ({ card, width = 26 }: CardViewProps) => {
   const keywords = card.reversed ? card.reversedKeywords : card.keywords;
   const orientation = card.reversed ? "reversed" : "upright";
   const borderColor = card.reversed ? colors.alternate : colors.accent;
@@ -23,13 +23,15 @@ export const CardView = ({ card, width = 26 }: CardViewProperties) => {
 
   return (
     <Box
-      borderStyle="single"
+      borderStyle="round"
       borderColor={borderColor}
       paddingX={1}
       width={width}
       flexDirection="column"
     >
-      <Text color={colors.muted}>{card.position}</Text>
+      <Text color={colors.muted}>
+        {tarotMarks.divider} {card.position}
+      </Text>
       <Text>
         <Text color={borderColor}>{marker} </Text>
         <Text bold color={colors.text}>
@@ -51,18 +53,21 @@ export const CardView = ({ card, width = 26 }: CardViewProperties) => {
 export const CardBackView = ({
   position,
   width = 26,
-}: CardBackViewProperties) => (
+}: CardBackViewProps) => (
   <Box
-    borderStyle="single"
-    borderColor={colors.muted}
+    borderStyle="round"
+    borderColor={colors.cool}
     paddingX={1}
     width={width}
     flexDirection="column"
   >
-    <Text color={colors.muted}>{position}</Text>
-    <Text color={colors.accent}>////////////////</Text>
-    <Text color={colors.accent}>\\\\\\\\\\\\\\\\</Text>
-    <Text color={colors.muted}>face down</Text>
-    <Text color={colors.muted}>awaiting reveal</Text>
+    <Text color={colors.muted}>
+      {tarotMarks.veil} {position}
+    </Text>
+    <Text color={colors.alternate}> . * . * . * . </Text>
+    <Text color={colors.accent}>   A R C A N A I  </Text>
+    <Text color={colors.cool}> * . * . * . * </Text>
+    <Text color={colors.muted}>veiled card</Text>
+    <Text color={colors.muted}>awaiting its voice</Text>
   </Box>
 );

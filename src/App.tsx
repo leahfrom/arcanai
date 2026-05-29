@@ -4,13 +4,14 @@ import { readWithAi } from "./ai/providers.js";
 import type { ProviderId, ReadingResponse } from "./ai/types.js";
 import type { AiConfig } from "./config.js";
 import { drawCards } from "./tarot/draw.js";
+import { tarotRitualLine } from "./tarot/ethics.js";
 import { getSpread, spreads } from "./tarot/spreads.js";
 import type { DrawnCard, Spread, SpreadId } from "./tarot/types.js";
 import { CardBackView, CardView } from "./ui/CardView.js";
 import { LoadingText } from "./ui/LoadingText.js";
 import { MarkdownText } from "./ui/MarkdownText.js";
 import { TextInput } from "./ui/TextInput.js";
-import { colors } from "./ui/theme.js";
+import { colors, tarotMarks } from "./ui/theme.js";
 
 type Phase = "question" | "reading";
 type DrawStage =
@@ -26,13 +27,13 @@ const REVEAL_PAUSE_DELAY_MS = 900;
 const CARD_REVEAL_DELAY_MS = 850;
 const READING_SETTLE_DELAY_MS = 700;
 
-type AppProperties = {
-  readonly initialQuestion?: string;
-  readonly initialSpread?: SpreadId;
-  readonly provider: ProviderId;
-  readonly model?: string;
-  readonly aiConfig: AiConfig;
-  readonly allowReversed: boolean;
+type AppProps = {
+  initialQuestion?: string;
+  initialSpread?: SpreadId;
+  provider: ProviderId;
+  model?: string;
+  aiConfig: AiConfig;
+  allowReversed: boolean;
 };
 
 export const App = ({
@@ -42,14 +43,14 @@ export const App = ({
   model,
   aiConfig,
   allowReversed,
-}: AppProperties) => {
+}: AppProps) => {
   const { exit } = useApp();
   const [phase, setPhase] = useState<Phase>(
     initialQuestion ? "reading" : "question",
   );
   const [question, setQuestion] = useState(initialQuestion);
   const [spreadId, setSpreadId] = useState<SpreadId>(initialSpread ?? "three");
-  const [selectedCards, setSelectedCards] = useState<readonly DrawnCard[]>([]);
+  const [selectedCards, setSelectedCards] = useState<DrawnCard[]>([]);
   const [placedCount, setPlacedCount] = useState(0);
   const [revealedCount, setRevealedCount] = useState(0);
   const [drawStage, setDrawStage] = useState<DrawStage>("waiting");
@@ -57,7 +58,7 @@ export const App = ({
   const [error, setError] = useState<string | undefined>();
   const hasStartedDraw = useRef(false);
   const spread = useMemo(() => getSpread(spreadId), [spreadId]);
-  const spreadCycle = useMemo<readonly SpreadId[]>(
+  const spreadCycle = useMemo<SpreadId[]>(
     () => [
       "three",
       ...spreads
@@ -83,7 +84,7 @@ export const App = ({
 
     hasStartedDraw.current = true;
     let isMounted = true;
-    const timers: Array<ReturnType<typeof setTimeout>> = [];
+    const timers: ReturnType<typeof setTimeout>[] = [];
     const drawnCards = drawCards({ spread: spreadId, allowReversed });
     const schedule = (callback: () => void, delay: number) => {
       const timer = setTimeout(() => {
@@ -199,9 +200,9 @@ export const App = ({
     return (
       <Frame eyebrow="question">
         <TextInput
-          label="Ask your question"
+          label="Whisper your question"
           placeholder="Press Enter for a general reading"
-          hint="Enter starts the reading. Tab changes spread."
+          hint="Enter opens the spread. Tab turns the spread wheel."
           onAlternate={cycleSpread}
           onSubmit={(value) => {
             setQuestion(value);
@@ -217,8 +218,11 @@ export const App = ({
   return (
     <Frame eyebrow="reading">
       <Box flexDirection="column" marginBottom={1}>
-        <Text color={colors.text} bold>
-          {spread.label}
+        <Text>
+          <Text color={colors.accent}>{tarotMarks.spark} </Text>
+          <Text color={colors.text} bold>
+            {spread.label}
+          </Text>
         </Text>
         <Text color={colors.muted}>{question || "General reading"}</Text>
       </Box>
@@ -263,12 +267,12 @@ export const App = ({
         <Box
           flexDirection="column"
           borderStyle="round"
-          borderColor={colors.accent}
+          borderColor={colors.alternate}
           paddingX={1}
           paddingY={1}
         >
           <Text color={colors.muted}>
-            Provider: {reading.provider}
+            {tarotMarks.spark} Source: {reading.provider}
             {reading.model ? ` / ${reading.model}` : ""}
             {reading.usedFallback ? " / fallback" : ""}
           </Text>
@@ -284,30 +288,34 @@ const Frame = ({
   children,
   eyebrow,
 }: {
-  readonly children: React.ReactNode;
-  readonly eyebrow: string;
+  children: React.ReactNode;
+  eyebrow: string;
 }) => (
   <Box flexDirection="column" paddingX={1} paddingY={1}>
     <Box flexDirection="column" marginBottom={1}>
       <Text>
-        <Text color={colors.accent}>* </Text>
+        <Text color={colors.cool}>{tarotMarks.veil} </Text>
+        <Text color={colors.accent}>{tarotMarks.spark} </Text>
         <Text color={colors.text} bold>
           ARCANAI
         </Text>
+        <Text color={colors.accent}> {tarotMarks.spark}</Text>
         <Text color={colors.muted}> {eyebrow}</Text>
       </Text>
+      <Text color={colors.muted}>{tarotRitualLine}</Text>
     </Box>
     {children}
   </Box>
 );
 
-const SpreadPreview = ({ spread }: { readonly spread: Spread }) => {
+const SpreadPreview = ({ spread }: { spread: Spread }) => {
   const cardCount = spread.positions.length;
   const cardLabel = cardCount === 1 ? "card" : "cards";
 
   return (
     <Box flexDirection="column" marginTop={1}>
       <Text>
+        <Text color={colors.cool}>{tarotMarks.divider} </Text>
         <Text color={colors.muted}>Spread </Text>
         <Text color={colors.accent} bold>
           {spread.label}

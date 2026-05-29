@@ -1,6 +1,6 @@
 import type { Spread, SpreadId } from "./types.js";
 
-export const spreads: readonly Spread[] = [
+export const spreads: Spread[] = [
   {
     id: "single",
     label: "Single card",

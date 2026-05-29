@@ -8,25 +8,25 @@ import type { SpreadId } from "./tarot/types.js";
 
 export type ConfigCommand =
   | {
-      readonly action: "show" | "path";
+      action: "show" | "path";
     }
   | {
-      readonly action: "set" | "unset";
-      readonly key: ConfigKey;
-      readonly value?: string;
+      action: "set" | "unset";
+      key: ConfigKey;
+      value?: string;
     };
 
 export type CliOptions = {
-  readonly help: boolean;
-  readonly version: boolean;
-  readonly json: boolean;
-  readonly interactive: boolean;
-  readonly question: string;
-  readonly spread: SpreadId;
-  readonly provider?: ProviderId;
-  readonly model?: string;
-  readonly allowReversed: boolean;
-  readonly configCommand?: ConfigCommand;
+  help: boolean;
+  version: boolean;
+  json: boolean;
+  interactive: boolean;
+  question: string;
+  spread: SpreadId;
+  provider?: ProviderId;
+  model?: string;
+  allowReversed: boolean;
+  configCommand?: ConfigCommand;
 };
 
 const validSpreads = new Set<SpreadId>(["single", "three", "cross"]);
@@ -89,7 +89,7 @@ export const getVersion = (): string => {
     : "0.0.0";
 };
 
-export const parseCliOptions = (argv: readonly string[]): CliOptions => {
+export const parseCliOptions = (argv: string[]): CliOptions => {
   const normalized = argv[0] === "draw" ? argv.slice(1) : argv;
 
   if (normalized[0] === "config") {
@@ -157,9 +157,9 @@ const emptyCliOptions = ({
   help = false,
   json = false,
 }: {
-  readonly configCommand?: ConfigCommand;
-  readonly help?: boolean;
-  readonly json?: boolean;
+  configCommand?: ConfigCommand;
+  help?: boolean;
+  json?: boolean;
 }): CliOptions => ({
   help,
   version: false,
@@ -172,7 +172,7 @@ const emptyCliOptions = ({
   configCommand,
 });
 
-const parseConfigOptions = (argv: readonly string[]): CliOptions => {
+const parseConfigOptions = (argv: string[]): CliOptions => {
   const json = argv.includes("--json");
   const args = argv.filter((arg) => arg !== "--json");
   const action = args[0] ?? "show";

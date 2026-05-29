@@ -2,12 +2,13 @@ import { readWithAi } from "./ai/providers.js";
 import { formatCard } from "./format.js";
 import type { CliOptions } from "./cli-options.js";
 import type { AiConfig } from "./config.js";
+import { tarotBoundaryNote } from "./tarot/ethics.js";
 import { drawCards } from "./tarot/draw.js";
 import { getSpread } from "./tarot/spreads.js";
 
 type DirectOptions = Omit<CliOptions, "configCommand" | "provider"> & {
-  readonly provider: NonNullable<CliOptions["provider"]>;
-  readonly aiConfig: AiConfig;
+  provider: NonNullable<CliOptions["provider"]>;
+  aiConfig: AiConfig;
 };
 
 export const runDirect = async (options: DirectOptions): Promise<void> => {
@@ -49,6 +50,7 @@ export const runDirect = async (options: DirectOptions): Promise<void> => {
       ? `Question: ${options.question}`
       : "Question: General reading",
   );
+  console.log(`Guide: ${tarotBoundaryNote}`);
   console.log("");
   for (const card of cards) {
     console.log(formatCard(card));

@@ -1,4 +1,5 @@
 import type { ReadingRequest, ReadingResponse } from "./types.js";
+import { tarotBoundaryNote } from "../tarot/ethics.js";
 
 export const createFallbackReading = ({
   question,
@@ -24,13 +25,18 @@ export const createFallbackReading = ({
   return {
     provider: "local",
     text: [
+      "Core message",
       `${focus} the cards ask you to slow down enough to notice the shape of the situation.`,
+      tarotBoundaryNote,
       "",
+      "Card-by-card reading",
       ...cardLines,
       "",
-      `Pattern: ${cards.length > 1 ? "Read together, these cards suggest a movement from the first position toward the last." : "This single card is the whole weather system for the moment."} Let ${strongestKeywords} be the first thread you follow.`,
+      "Pattern across the spread",
+      `${cards.length > 1 ? "Read together, these cards suggest a movement from the first position toward the last." : "This single card is the whole weather system for the moment."} Let ${strongestKeywords} be the first thread you follow.`,
       "",
-      "Next step: write one sentence naming what you know, one naming what you fear, and one naming the smallest honest action available today.",
+      "One practical next step",
+      "Write one sentence naming what you know, one naming what you fear, and one naming the smallest honest action available today.",
     ].join("\n"),
     usedFallback: true,
   };

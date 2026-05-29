@@ -9,10 +9,12 @@ export const colors = {
 } as const;
 
 export const tarotMarks = {
-  divider: "::",
+  divider: ":*:",
   prompt: "?>",
   selected: ">>",
   idle: "..",
+  spark: "*",
+  veil: "~",
   upright: "/\\",
   reversed: "\\/",
 } as const;

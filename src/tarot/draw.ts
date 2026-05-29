@@ -3,12 +3,12 @@ import { getSpread } from "./spreads.js";
 import type { Card, DrawnCard, SpreadId } from "./types.js";
 
 export type DrawOptions = {
-  readonly spread: SpreadId;
-  readonly allowReversed?: boolean;
-  readonly random?: () => number;
+  spread: SpreadId;
+  allowReversed?: boolean;
+  random?: () => number;
 };
 
-const shuffle = <T>(items: readonly T[], random: () => number): T[] => {
+const shuffle = <T>(items: T[], random: () => number): T[] => {
   const shuffled = [...items];
 
   for (let index = shuffled.length - 1; index > 0; index -= 1) {
@@ -26,7 +26,7 @@ export const drawCards = ({
   spread,
   allowReversed = true,
   random = Math.random,
-}: DrawOptions): readonly DrawnCard[] => {
+}: DrawOptions): DrawnCard[] => {
   const selectedSpread = getSpread(spread);
   const shuffled = shuffle(deck, random);
 

@@ -21,5 +21,7 @@ describe("buildReadingPrompt", () => {
     expect(prompt).toContain("Single card");
     expect(prompt).toContain(cards[0]!.name);
     expect(prompt).toContain("Treat tarot as reflective symbolism");
+    expect(prompt).toContain("Do not claim certainty");
+    expect(prompt).toContain("reframe toward the querent's own choices");
   });
 });

@@ -11,6 +11,7 @@ A TypeScript terminal tarot CLI for drawing cards, exploring spreads, and option
 - Optional reversed cards
 - OpenAI and Ollama provider support through the AI SDK
 - Local symbolic fallback when no AI provider is configured
+- Built-in reading boundaries for consent, agency, and practical care
 - Machine-readable JSON output for scripts and experiments
 
 ## Requirements
@@ -76,6 +77,17 @@ Draw upright cards only:
 ```sh
 scry --no-reversed
 ```
+
+## Reading Boundaries
+
+`arcanai` treats tarot as reflective symbolism, not certain prediction. Readings
+should keep agency and consent at the center, speak in possibilities rather than
+fixed fate, and end with a small practical next step.
+
+The app avoids medical, legal, financial, death, pregnancy, curse, or guaranteed
+outcome claims. It also avoids presenting another person's private thoughts or
+feelings as fact; those questions are reframed toward your choices, boundaries,
+and next right action.
 
 ## AI Providers
 

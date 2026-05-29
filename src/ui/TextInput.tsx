@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { Box, Text, useInput } from "ink";
 import { colors, tarotMarks } from "./theme.js";
 
-type TextInputProperties = {
-  readonly label: string;
-  readonly placeholder: string;
-  readonly hint: string;
-  readonly children?: React.ReactNode;
-  readonly onAlternate?: () => void;
-  readonly onSubmit: (value: string) => void;
+type TextInputProps = {
+  label: string;
+  placeholder: string;
+  hint: string;
+  children?: React.ReactNode;
+  onAlternate?: () => void;
+  onSubmit: (value: string) => void;
 };
 
 export const TextInput = ({
@@ -18,7 +18,7 @@ export const TextInput = ({
   onAlternate,
   placeholder,
   onSubmit,
-}: TextInputProperties) => {
+}: TextInputProps) => {
   const [value, setValue] = useState("");
 
   useInput((input, key) => {

@@ -3,22 +3,22 @@ import { Box, Text, useInput } from "ink";
 import { colors, tarotMarks } from "./theme.js";
 
 type MenuItem<T extends string> = {
-  readonly value: T;
-  readonly label: string;
-  readonly hint: string;
+  value: T;
+  label: string;
+  hint: string;
 };
 
-type MenuProperties<T extends string> = {
-  readonly title: string;
-  readonly items: readonly MenuItem<T>[];
-  readonly onSubmit: (value: T) => void;
+type MenuProps<T extends string> = {
+  title: string;
+  items: MenuItem<T>[];
+  onSubmit: (value: T) => void;
 };
 
 export const Menu = <T extends string>({
   title,
   items,
   onSubmit,
-}: MenuProperties<T>) => {
+}: MenuProps<T>) => {
   const [index, setIndex] = useState(0);
 
   useInput((_input, key) => {

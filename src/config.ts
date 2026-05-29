@@ -33,15 +33,15 @@ const configSchema = z
 export type UserConfig = z.infer<typeof configSchema>;
 
 export type AiConfig = {
-  readonly provider: ProviderId;
-  readonly openai: {
-    readonly apiKey?: string;
-    readonly baseUrl?: string;
-    readonly model: string;
+  provider: ProviderId;
+  openai: {
+    apiKey?: string;
+    baseUrl?: string;
+    model: string;
   };
-  readonly ollama: {
-    readonly baseUrl: string;
-    readonly model: string;
+  ollama: {
+    baseUrl: string;
+    model: string;
   };
 };
 
@@ -53,7 +53,7 @@ export type ConfigKey =
   | "ollama.baseUrl"
   | "ollama.model";
 
-export const configKeys: readonly ConfigKey[] = [
+export const configKeys: ConfigKey[] = [
   "provider",
   "openai.apiKey",
   "openai.baseUrl",
@@ -153,8 +153,8 @@ export const loadAiConfig = ({
   env = process.env,
   provider,
 }: {
-  readonly env?: NodeJS.ProcessEnv;
-  readonly provider?: ProviderId;
+  env?: NodeJS.ProcessEnv;
+  provider?: ProviderId;
 } = {}): AiConfig => {
   const userConfig = readUserConfig(env);
 

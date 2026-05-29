@@ -3,25 +3,44 @@ import { Box, Text } from "ink";
 import { colors, tarotMarks } from "./theme.js";
 
 type InlineToken = {
-  readonly text: string;
-  readonly kind: "plain" | "bold" | "italic" | "code";
+  text: string;
+  kind: "plain" | "bold" | "italic" | "code";
 };
 
-type MarkdownTextProperties = {
-  readonly children: string;
+type MarkdownTextProps = {
+  children: string;
 };
 
-export const MarkdownText = ({ children }: MarkdownTextProperties) => {
-  const lines = children.replaceAll("\r\n", "\n").split("\n");
-  const nodes: React.ReactNode[] = [];
+type MarkdownBlock =
+  | {
+      type: "blank";
+    }
+  | {
+      type: "heading";
+      text: string;
+    }
+  | {
+      type: "listItem";
+      indent: number;
+      marker: string;
+      text: string;
+    }
+  | {
+      type: "paragraph";
+      text: string;
+    };
+
+export const parseMarkdownBlocks = (value: string): MarkdownBlock[] => {
+  const lines = value.replaceAll("\r\n", "\n").split("\n");
+  const blocks: MarkdownBlock[] = [];
   let previousWasBlank = false;
 
-  lines.forEach((rawLine, index) => {
+  lines.forEach((rawLine) => {
     const line = rawLine.trimEnd();
 
     if (line.trim().length === 0) {
-      if (!previousWasBlank && nodes.length > 0) {
-        nodes.push(<Text key={`space:${index}`}> </Text>);
+      if (!previousWasBlank && blocks.length > 0) {
+        blocks.push({ type: "blank" });
       }
 
       previousWasBlank = true;
@@ -32,40 +51,75 @@ export const MarkdownText = ({ children }: MarkdownTextProperties) => {
 
     const heading = line.match(/^#{1,6}\s+(.+)$/);
     if (heading) {
-      nodes.push(
-        <Text key={`heading:${index}`} color={colors.accent} bold>
-          {tarotMarks.divider} {stripWrappingBold(heading[1])}
-        </Text>,
-      );
+      blocks.push({ type: "heading", text: stripWrappingBold(heading[1]!) });
       return;
     }
 
     const boldHeading = line.trim().match(/^\*\*(.+)\*\*$/);
     if (boldHeading) {
+      blocks.push({ type: "heading", text: boldHeading[1]! });
+      return;
+    }
+
+    const listItem = line.match(/^(\s*)(?:([-*+])|(\d+[.)]))\s+(.+)$/);
+    if (listItem) {
+      blocks.push({
+        type: "listItem",
+        indent: Math.floor(listItem[1]!.length / 2),
+        marker: listItem[3] ?? "-",
+        text: listItem[4]!.trim(),
+      });
+      return;
+    }
+
+    const previousBlock = blocks[blocks.length - 1];
+    if (previousBlock?.type === "listItem" && /^\s+\S/.test(line)) {
+      blocks[blocks.length - 1] = {
+        ...previousBlock,
+        text: `${previousBlock.text} ${line.trim()}`,
+      };
+      return;
+    }
+
+    blocks.push({ type: "paragraph", text: line });
+  });
+
+  return blocks;
+};
+
+export const MarkdownText = ({ children }: MarkdownTextProps) => {
+  const blocks = parseMarkdownBlocks(children);
+  const nodes: React.ReactNode[] = [];
+
+  blocks.forEach((block, index) => {
+    if (block.type === "blank") {
+      nodes.push(<Text key={`space:${index}`}> </Text>);
+      return;
+    }
+
+    if (block.type === "heading") {
       nodes.push(
-        <Text key={`bold-heading:${index}`} color={colors.accent} bold>
-          {tarotMarks.divider} {boldHeading[1]}
+        <Text key={`heading:${index}`} color={colors.accent} bold>
+          {tarotMarks.divider} {block.text}
         </Text>,
       );
       return;
     }
 
-    const listItem = line.match(/^(\s*)[-*+]\s+(.+)$/);
-    if (listItem) {
+    if (block.type === "listItem") {
       nodes.push(
-        <Box
-          key={`list:${index}`}
-          paddingLeft={Math.floor(listItem[1].length / 2)}
-        >
-          <Text color={colors.alternate}>- </Text>
-          <Text>{renderInline(listItem[2], index)}</Text>
+        <Box key={`list:${index}`} paddingLeft={block.indent}>
+          <Text color={colors.alternate}>{block.marker} </Text>
+          <Box flexShrink={1}>
+            <Text>{renderInline(block.text, index)}</Text>
+          </Box>
         </Box>,
       );
       return;
     }
 
     nodes.push(
-      <Text key={`paragraph:${index}`}>{renderInline(line, index)}</Text>,
+      <Text key={`paragraph:${index}`}>{renderInline(block.text, index)}</Text>,
     );
   });
 
@@ -136,17 +190,17 @@ const parseInline = (value: string): InlineToken[] => {
 };
 
 type InlineMatch = {
-  readonly index: number;
-  readonly length: number;
-  readonly text: string;
-  readonly kind: Exclude<InlineToken["kind"], "plain">;
+  index: number;
+  length: number;
+  text: string;
+  kind: Exclude<InlineToken["kind"], "plain">;
 };
 
 const findNextInlineMatch = (value: string): InlineMatch | undefined => {
-  const patterns: ReadonlyArray<{
-    readonly kind: InlineMatch["kind"];
-    readonly regex: RegExp;
-  }> = [
+  const patterns: {
+    kind: InlineMatch["kind"];
+    regex: RegExp;
+  }[] = [
     { kind: "code", regex: /`([^`]+)`/ },
     { kind: "bold", regex: /\*\*([^*]+)\*\*/ },
     { kind: "italic", regex: /(?<!\*)\*([^*]+)\*(?!\*)/ },

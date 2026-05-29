@@ -1,8 +1,25 @@
 import type { Card, Suit } from "./types.js";
 
-const majorArcanaSeed: ReadonlyArray<
-  readonly [string, readonly string[], readonly string[]]
-> = [
+type MajorArcanaSeed = [
+  name: string,
+  keywords: string[],
+  reversedKeywords: string[],
+];
+
+type KeywordProfile = {
+  keywords: string[];
+  reversedKeywords: string[];
+};
+
+type SuitProfile = KeywordProfile & {
+  theme: string;
+};
+
+type RankProfile = KeywordProfile & {
+  rank: string;
+};
+
+const majorArcanaSeed: MajorArcanaSeed[] = [
   [
     "The Fool",
     ["beginnings", "trust", "leap of faith"],
@@ -115,7 +132,7 @@ const majorArcanaSeed: ReadonlyArray<
   ],
 ];
 
-const majorArcana: readonly Card[] = majorArcanaSeed.map(
+const majorArcana: Card[] = majorArcanaSeed.map(
   ([name, keywords, reversedKeywords]) => ({
     name,
     arcana: "major",
@@ -124,14 +141,7 @@ const majorArcana: readonly Card[] = majorArcanaSeed.map(
   }),
 );
 
-const suitProfiles: Record<
-  Suit,
-  {
-    readonly theme: string;
-    readonly keywords: readonly string[];
-    readonly reversedKeywords: readonly string[];
-  }
-> = {
+const suitProfiles: Record<Suit, SuitProfile> = {
   cups: {
     theme: "emotion",
     keywords: ["feeling", "connection", "receptivity"],
@@ -154,11 +164,7 @@ const suitProfiles: Record<
   },
 };
 
-const rankProfiles: ReadonlyArray<{
-  readonly rank: string;
-  readonly keywords: readonly string[];
-  readonly reversedKeywords: readonly string[];
-}> = [
+const rankProfiles: RankProfile[] = [
   {
     rank: "Ace",
     keywords: ["seed", "opening", "potential"],
@@ -254,4 +260,4 @@ const minorArcana = (Object.keys(suitProfiles) as Suit[]).flatMap((suit) => {
   }));
 });
 
-export const deck: readonly Card[] = [...majorArcana, ...minorArcana];
+export const deck: Card[] = [...majorArcana, ...minorArcana];
