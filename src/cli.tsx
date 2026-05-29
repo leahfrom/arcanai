@@ -12,6 +12,7 @@ import {
   unsetUserConfigValue,
 } from "./config.js";
 import { runDirect } from "./run-direct.js";
+import { maybePrintUpdateNotice } from "./update-check.js";
 import type { CliOptions } from "./cli-options.js";
 
 const runConfigCommand = (options: CliOptions): void => {
@@ -60,6 +61,10 @@ const main = async (): Promise<void> => {
 
   if (options.configCommand) {
     runConfigCommand(options);
+    await maybePrintUpdateNotice({
+      currentVersion: getVersion(),
+      json: options.json,
+    });
     return;
   }
 
@@ -74,6 +79,10 @@ const main = async (): Promise<void> => {
 
   if (!shouldUseInteractive) {
     await runDirect({ ...options, provider, aiConfig });
+    await maybePrintUpdateNotice({
+      currentVersion: getVersion(),
+      json: options.json,
+    });
     return;
   }
 
@@ -89,6 +98,10 @@ const main = async (): Promise<void> => {
   );
 
   await instance.waitUntilExit();
+  await maybePrintUpdateNotice({
+    currentVersion: getVersion(),
+    json: options.json,
+  });
 };
 
 main().catch((error) => {

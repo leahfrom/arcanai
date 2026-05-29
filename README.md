@@ -78,6 +78,15 @@ Draw upright cards only:
 scry --no-reversed
 ```
 
+When a newer release is available, `arcanai` may print a short update notice
+after a successful interactive or plain-text run. The notice is written to
+stderr, skipped for JSON output and non-interactive pipes, and cached so it does
+not check on every invocation.
+
+```sh
+npm install -g https://github.com/leahfrom/arcanai/releases/latest/download/arcanai.tgz
+```
+
 ## Reading Boundaries
 
 `arcanai` treats tarot as reflective symbolism, not certain prediction. Readings
@@ -129,6 +138,7 @@ Useful environment variables:
 ```sh
 ARCANAI_CONFIG=~/.config/arcanai/config.json
 ARCANAI_PROVIDER=auto
+ARCANAI_NO_UPDATE_CHECK=1
 OPENAI_API_KEY=...
 OPENAI_MODEL=gpt-5.5
 OPENAI_BASE_URL=https://api.openai.com/v1

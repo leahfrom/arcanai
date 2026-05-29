@@ -63,6 +63,7 @@ Options
 Environment
   ARCANAI_CONFIG           Config path override
   ARCANAI_PROVIDER         Default provider: auto, openai, ollama, none
+  ARCANAI_NO_UPDATE_CHECK  Disable the post-run update notice
   OPENAI_API_KEY             Enables the OpenAI provider
   OPENAI_MODEL               Default OpenAI model override
   OPENAI_BASE_URL            OpenAI-compatible API base URL
