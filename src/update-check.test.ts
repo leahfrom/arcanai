@@ -120,6 +120,7 @@ describe("maybePrintUpdateNotice", () => {
 
     await maybePrintUpdateNotice({
       currentVersion: "1.1.0",
+      env: {},
       fetchImpl: releaseFetch(),
       cachePath: cachePath(),
       stdout: { isTTY: true },
@@ -142,6 +143,7 @@ describe("maybePrintUpdateNotice", () => {
 
     await maybePrintUpdateNotice({
       currentVersion: "1.1.0",
+      env: {},
       fetchImpl,
       cachePath: cachePath(),
       stdout: { isTTY: true },
@@ -159,6 +161,7 @@ describe("maybePrintUpdateNotice", () => {
 
     await maybePrintUpdateNotice({
       currentVersion: "1.1.0",
+      env: {},
       fetchImpl,
       cachePath: cachePath(),
       stdout: { isTTY: false },
