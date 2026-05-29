@@ -6,6 +6,7 @@ import { getVersion, helpText, parseCliOptions } from "./cli-options.js";
 import {
   getConfigPath,
   loadAiConfig,
+  loadUpdateCheckConfig,
   readUserConfig,
   redactUserConfig,
   setUserConfigValue,
@@ -61,14 +62,22 @@ const main = async (): Promise<void> => {
 
   if (options.configCommand) {
     runConfigCommand(options);
+    const updateCheckConfig = loadUpdateCheckConfig({
+      updateCheck: options.updateCheck,
+    });
+
     await maybePrintUpdateNotice({
       currentVersion: getVersion(),
+      enabled: updateCheckConfig.updateCheck,
       json: options.json,
     });
     return;
   }
 
   const aiConfig = loadAiConfig({ provider: options.provider });
+  const updateCheckConfig = loadUpdateCheckConfig({
+    updateCheck: options.updateCheck,
+  });
   const provider = aiConfig.provider;
 
   const shouldUseInteractive =
@@ -81,6 +90,7 @@ const main = async (): Promise<void> => {
     await runDirect({ ...options, provider, aiConfig });
     await maybePrintUpdateNotice({
       currentVersion: getVersion(),
+      enabled: updateCheckConfig.updateCheck,
       json: options.json,
     });
     return;
@@ -100,6 +110,7 @@ const main = async (): Promise<void> => {
   await instance.waitUntilExit();
   await maybePrintUpdateNotice({
     currentVersion: getVersion(),
+    enabled: updateCheckConfig.updateCheck,
     json: options.json,
   });
 };

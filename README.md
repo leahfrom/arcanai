@@ -87,6 +87,12 @@ not check on every invocation.
 npm install -g https://github.com/leahfrom/arcanai/releases/latest/download/arcanai.tgz
 ```
 
+Disable update notices for one run:
+
+```sh
+scry --no-update-check
+```
+
 ## Reading Boundaries
 
 `arcanai` treats tarot as reflective symbolism, not certain prediction. Readings
@@ -113,6 +119,7 @@ environment variables:
 scry config set openai.apiKey sk-...
 scry config set openai.model gpt-5.5
 scry config set ollama.model llama3.2
+scry config set updateCheck false
 ```
 
 Config is stored at `${XDG_CONFIG_HOME:-~/.config}/arcanai/config.json`, or at
@@ -124,6 +131,9 @@ Config values use this precedence:
 ```text
 CLI flags > environment variables > config file > defaults
 ```
+
+If update checks are disabled in config, `scry --update-check` enables them for
+one run. `ARCANAI_NO_UPDATE_CHECK=1` also disables them.
 
 Provider examples:
 
@@ -150,6 +160,7 @@ Useful config keys:
 
 ```text
 provider
+updateCheck
 openai.apiKey
 openai.baseUrl
 openai.model
@@ -167,6 +178,8 @@ ollama.model
     --no-reversed          Draw upright cards only
     --json                 Print machine-readable output
     --no-interactive       Skip the Ink UI
+    --update-check         Allow post-run update notices for this run
+    --no-update-check      Skip post-run update notices for this run
 -h, --help                 Show help
 -v, --version              Show version
 ```

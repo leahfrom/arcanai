@@ -155,6 +155,24 @@ describe("maybePrintUpdateNotice", () => {
     expect(write).not.toHaveBeenCalled();
   });
 
+  it("does not print when update checks are disabled", async () => {
+    const write = vi.fn();
+    const fetchImpl = releaseFetch();
+
+    await maybePrintUpdateNotice({
+      currentVersion: "1.1.0",
+      enabled: false,
+      env: {},
+      fetchImpl,
+      cachePath: cachePath(),
+      stdout: { isTTY: true },
+      stderr: { isTTY: true, write },
+    });
+
+    expect(fetchImpl).not.toHaveBeenCalled();
+    expect(write).not.toHaveBeenCalled();
+  });
+
   it("does not print when stdout is not a TTY", async () => {
     const write = vi.fn();
     const fetchImpl = releaseFetch();

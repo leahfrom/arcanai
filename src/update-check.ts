@@ -56,6 +56,7 @@ type PrintUpdateNoticeOptions = UpdateCheckOptions & {
     isTTY?: boolean;
     write: (message: string) => unknown;
   };
+  enabled?: boolean;
   json?: boolean;
 };
 
@@ -211,10 +212,12 @@ const isFresh = (cache: UpdateCache, now: number): boolean =>
 
 const shouldSkipUpdateCheck = (
   env: NodeJS.ProcessEnv,
+  enabled: boolean,
   json: boolean,
   stdout?: { isTTY?: boolean },
   stderr?: { isTTY?: boolean },
 ): boolean =>
+  !enabled ||
   json ||
   stdout?.isTTY !== true ||
   stderr?.isTTY !== true ||
@@ -272,11 +275,12 @@ export const formatUpdateNotice = (notice: UpdateNotice): string =>
 export const maybePrintUpdateNotice = async ({
   stdout = process.stdout,
   stderr = process.stderr,
+  enabled = true,
   json = false,
   env = process.env,
   ...options
 }: PrintUpdateNoticeOptions): Promise<void> => {
-  if (shouldSkipUpdateCheck(env, json, stdout, stderr)) {
+  if (shouldSkipUpdateCheck(env, enabled, json, stdout, stderr)) {
     return;
   }
 

@@ -5,9 +5,11 @@ import { describe, expect, it } from "vitest";
 import {
   getConfigPath,
   loadAiConfig,
+  loadUpdateCheckConfig,
   readUserConfig,
   redactUserConfig,
   setUserConfigValue,
+  unsetUserConfigValue,
 } from "./config.js";
 
 const testEnv = () => {
@@ -80,5 +82,38 @@ describe("config", () => {
       },
     });
     expect(readFileSync(getConfigPath(env), "utf8")).toContain("sk-test");
+  });
+
+  it("loads update check settings from cli, env, and config", () => {
+    const env = testEnv();
+
+    expect(loadUpdateCheckConfig({ env })).toEqual({ updateCheck: true });
+
+    setUserConfigValue("updateCheck", "false", env);
+
+    expect(readUserConfig(env)).toMatchObject({ updateCheck: false });
+    expect(loadUpdateCheckConfig({ env })).toEqual({ updateCheck: false });
+    expect(loadUpdateCheckConfig({ env, updateCheck: true })).toEqual({
+      updateCheck: true,
+    });
+    expect(
+      loadUpdateCheckConfig({
+        env: { ...env, ARCANAI_NO_UPDATE_CHECK: "1" },
+      }),
+    ).toEqual({ updateCheck: false });
+
+    unsetUserConfigValue("updateCheck", env);
+
+    expect(readUserConfig(env)).toEqual({});
+  });
+
+  it("accepts common boolean values for updateCheck", () => {
+    const env = testEnv();
+
+    setUserConfigValue("updateCheck", "off", env);
+    expect(readUserConfig(env)).toMatchObject({ updateCheck: false });
+
+    setUserConfigValue("updateCheck", "yes", env);
+    expect(readUserConfig(env)).toMatchObject({ updateCheck: true });
   });
 });

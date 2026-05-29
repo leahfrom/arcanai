@@ -26,6 +26,7 @@ export type CliOptions = {
   provider?: ProviderId;
   model?: string;
   allowReversed: boolean;
+  updateCheck?: boolean;
   configCommand?: ConfigCommand;
 };
 
@@ -57,6 +58,8 @@ Options
       --no-reversed          Draw upright cards only
       --json                 Print machine-readable output
       --no-interactive       Skip the Ink UI
+      --update-check         Allow post-run update notices for this run
+      --no-update-check      Skip post-run update notices for this run
   -h, --help                 Show help
   -v, --version              Show version
 
@@ -72,6 +75,7 @@ Environment
 
 Config keys
   provider
+  updateCheck
   openai.apiKey
   openai.baseUrl
   openai.model
@@ -110,6 +114,8 @@ export const parseCliOptions = (argv: string[]): CliOptions => {
       "no-interactive": { type: "boolean", default: false },
       reversed: { type: "boolean", default: true },
       "no-reversed": { type: "boolean", default: false },
+      "update-check": { type: "boolean" },
+      "no-update-check": { type: "boolean", default: false },
       help: { type: "boolean", short: "h", default: false },
       version: { type: "boolean", short: "v", default: false },
     },
@@ -117,6 +123,7 @@ export const parseCliOptions = (argv: string[]): CliOptions => {
 
   const spread = values.spread;
   const provider = values.provider;
+  const updateCheck = values["update-check"];
 
   if (typeof spread !== "string" || !validSpreads.has(spread as SpreadId)) {
     throw new Error(
@@ -139,6 +146,10 @@ export const parseCliOptions = (argv: string[]): CliOptions => {
     );
   }
 
+  if (values["no-update-check"] && updateCheck) {
+    throw new Error("Use either --update-check or --no-update-check, not both.");
+  }
+
   return {
     help: Boolean(values.help),
     version: Boolean(values.version),
@@ -150,6 +161,11 @@ export const parseCliOptions = (argv: string[]): CliOptions => {
       typeof provider === "string" ? (provider as ProviderId) : undefined,
     model: typeof values.model === "string" ? values.model : undefined,
     allowReversed: Boolean(values.reversed) && !values["no-reversed"],
+    updateCheck: values["no-update-check"]
+      ? false
+      : updateCheck
+        ? true
+        : undefined,
   };
 };
 

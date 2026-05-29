@@ -14,6 +14,7 @@ const providerSchema = z.enum(["auto", "openai", "ollama", "none"]);
 const configSchema = z
   .object({
     provider: providerSchema.optional(),
+    updateCheck: z.boolean().optional(),
     openai: z
       .object({
         apiKey: z.string().min(1).optional(),
@@ -47,6 +48,7 @@ export type AiConfig = {
 
 export type ConfigKey =
   | "provider"
+  | "updateCheck"
   | "openai.apiKey"
   | "openai.baseUrl"
   | "openai.model"
@@ -55,6 +57,7 @@ export type ConfigKey =
 
 export const configKeys: ConfigKey[] = [
   "provider",
+  "updateCheck",
   "openai.apiKey",
   "openai.baseUrl",
   "openai.model",
@@ -72,6 +75,10 @@ const defaultAiConfig = {
     model: "llama3.2",
   },
 } as const satisfies AiConfig;
+
+const defaultUpdateCheckConfig = {
+  updateCheck: true,
+} as const;
 
 const nonEmpty = (value: string | undefined): string | undefined => {
   const trimmed = value?.trim();
@@ -97,6 +104,29 @@ const parseProvider = (
   }
 
   return result.data;
+};
+
+const parseBoolean = (
+  value: string | undefined,
+  source: string,
+): boolean | undefined => {
+  const trimmed = nonEmpty(value)?.toLowerCase();
+
+  if (!trimmed) {
+    return undefined;
+  }
+
+  if (["1", "true", "yes", "on"].includes(trimmed)) {
+    return true;
+  }
+
+  if (["0", "false", "no", "off"].includes(trimmed)) {
+    return false;
+  }
+
+  throw new Error(
+    `Invalid ${source} "${value}". Expected true, false, yes, no, on, off, 1, or 0.`,
+  );
 };
 
 const formatZodError = (error: z.ZodError): string =>
@@ -185,6 +215,27 @@ export const loadAiConfig = ({
   };
 };
 
+export const loadUpdateCheckConfig = ({
+  env = process.env,
+  updateCheck,
+}: {
+  env?: NodeJS.ProcessEnv;
+  updateCheck?: boolean;
+} = {}): { updateCheck: boolean } => {
+  const userConfig = readUserConfig(env);
+  const envDisabled =
+    nonEmpty(env.ARCANAI_NO_UPDATE_CHECK) !== undefined ||
+    nonEmpty(env.NO_UPDATE_NOTIFIER) !== undefined;
+
+  return {
+    updateCheck:
+      updateCheck ??
+      (envDisabled ? false : undefined) ??
+      userConfig.updateCheck ??
+      defaultUpdateCheckConfig.updateCheck,
+  };
+};
+
 const cloneConfig = (config: UserConfig): UserConfig =>
   JSON.parse(JSON.stringify(config)) as UserConfig;
 
@@ -244,6 +295,9 @@ export const setUserConfigValue = (
     case "provider":
       next.provider = parseProvider(normalizedValue, "provider");
       break;
+    case "updateCheck":
+      next.updateCheck = parseBoolean(normalizedValue, "updateCheck");
+      break;
     case "openai.apiKey":
       next.openai = { ...next.openai, apiKey: normalizedValue };
       break;
@@ -275,6 +329,9 @@ export const unsetUserConfigValue = (
   switch (key) {
     case "provider":
       delete next.provider;
+      break;
+    case "updateCheck":
+      delete next.updateCheck;
       break;
     case "openai.apiKey":
       delete next.openai?.apiKey;
