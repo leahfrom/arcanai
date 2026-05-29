@@ -1,6 +1,9 @@
 name: Release package
 
 on:
+  push:
+    tags:
+      - "v*"
   release:
     types: [published]
   workflow_dispatch:
@@ -13,6 +16,9 @@ on:
 permissions:
   contents: write
 
+env:
+  RELEASE_TAG: ${{ github.event.release.tag_name || github.event.inputs.tag || github.ref_name }}
+
 jobs:
   package:
     name: Build release tarball
@@ -22,7 +28,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.release.tag_name || inputs.tag }}
+          ref: ${{ env.RELEASE_TAG }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -48,11 +54,11 @@ jobs:
       - name: Ensure release exists
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+          TAG: ${{ env.RELEASE_TAG }}
         run: gh release view "$TAG" >/dev/null || gh release create "$TAG" --title "$TAG" --notes "Release $TAG"
 
       - name: Upload tarball
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+          TAG: ${{ env.RELEASE_TAG }}
         run: gh release upload "$TAG" arcanai.tgz --clobber
