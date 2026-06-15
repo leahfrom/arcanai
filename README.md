@@ -9,7 +9,7 @@ A TypeScript terminal tarot CLI for drawing cards, exploring spreads, and option
 - Interactive terminal readings with `scry` or `arcanai`
 - Single-card, three-card, and five-card cross spreads
 - Optional reversed cards
-- OpenAI and Ollama provider support through the AI SDK
+- OpenAI, Mistral, and Ollama provider support through the AI SDK
 - Local symbolic fallback when no AI provider is configured
 - Built-in reading boundaries for consent, agency, and practical care
 - Machine-readable JSON output for scripts and experiments
@@ -19,6 +19,7 @@ A TypeScript terminal tarot CLI for drawing cards, exploring spreads, and option
 - Node.js 24 or newer
 - Git, for installing directly from GitHub
 - Optional: an OpenAI API key for OpenAI readings
+- Optional: a Mistral API key for Mistral readings
 - Optional: a running Ollama server for local model readings
 
 ## Install
@@ -109,6 +110,7 @@ and next right action.
 By default, `arcanai` uses `--provider auto`:
 
 - If `OPENAI_API_KEY` is set, it tries OpenAI first.
+- If `MISTRAL_API_KEY` is set, it tries Mistral with Medium 3.5 by default.
 - It then tries Ollama at `OLLAMA_HOST` or `http://127.0.0.1:11434/api`.
 - If no provider responds, it prints a local symbolic fallback reading.
 
@@ -118,6 +120,8 @@ environment variables:
 ```sh
 scry config set openai.apiKey sk-...
 scry config set openai.model gpt-5.5
+scry config set mistral.apiKey ...
+scry config set mistral.model mistral-medium-3.5
 scry config set ollama.model llama3.2
 scry config set updateCheck false
 ```
@@ -139,6 +143,7 @@ Provider examples:
 
 ```sh
 scry --provider openai --model gpt-5.5
+scry --provider mistral --model mistral-medium-3.5
 scry --provider ollama --model llama3.2
 scry --provider none
 ```
@@ -152,6 +157,9 @@ ARCANAI_NO_UPDATE_CHECK=1
 OPENAI_API_KEY=...
 OPENAI_MODEL=gpt-5.5
 OPENAI_BASE_URL=https://api.openai.com/v1
+MISTRAL_API_KEY=...
+MISTRAL_MODEL=mistral-medium-3.5
+MISTRAL_BASE_URL=https://api.mistral.ai/v1
 OLLAMA_HOST=http://127.0.0.1:11434/api
 ARCANAI_OLLAMA_MODEL=llama3.2
 ```
@@ -164,6 +172,9 @@ updateCheck
 openai.apiKey
 openai.baseUrl
 openai.model
+mistral.apiKey
+mistral.baseUrl
+mistral.model
 ollama.baseUrl
 ollama.model
 ```
@@ -173,7 +184,7 @@ ollama.model
 ```text
 -q, --question <text>      Question or theme for the reading
 -s, --spread <spread>      single, three, cross (default: three)
--p, --provider <provider>  auto, openai, ollama, none (default: auto)
+-p, --provider <provider>  auto, openai, mistral, ollama, none (default: auto)
 -m, --model <model>        Override provider model
     --no-reversed          Draw upright cards only
     --json                 Print machine-readable output

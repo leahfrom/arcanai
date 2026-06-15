@@ -10,12 +10,19 @@ import { dirname, join } from "node:path";
 import { z } from "zod";
 import type { ProviderId } from "./ai/types.js";
 
-const providerSchema = z.enum(["auto", "openai", "ollama", "none"]);
+const providerSchema = z.enum(["auto", "openai", "mistral", "ollama", "none"]);
 const configSchema = z
   .object({
     provider: providerSchema.optional(),
     updateCheck: z.boolean().optional(),
     openai: z
+      .object({
+        apiKey: z.string().min(1).optional(),
+        baseUrl: z.string().min(1).optional(),
+        model: z.string().min(1).optional(),
+      })
+      .optional(),
+    mistral: z
       .object({
         apiKey: z.string().min(1).optional(),
         baseUrl: z.string().min(1).optional(),
@@ -40,6 +47,11 @@ export type AiConfig = {
     baseUrl?: string;
     model: string;
   };
+  mistral: {
+    apiKey?: string;
+    baseUrl?: string;
+    model: string;
+  };
   ollama: {
     baseUrl: string;
     model: string;
@@ -52,6 +64,9 @@ export type ConfigKey =
   | "openai.apiKey"
   | "openai.baseUrl"
   | "openai.model"
+  | "mistral.apiKey"
+  | "mistral.baseUrl"
+  | "mistral.model"
   | "ollama.baseUrl"
   | "ollama.model";
 
@@ -61,6 +76,9 @@ export const configKeys: ConfigKey[] = [
   "openai.apiKey",
   "openai.baseUrl",
   "openai.model",
+  "mistral.apiKey",
+  "mistral.baseUrl",
+  "mistral.model",
   "ollama.baseUrl",
   "ollama.model",
 ];
@@ -69,6 +87,9 @@ const defaultAiConfig = {
   provider: "auto",
   openai: {
     model: "gpt-5.5",
+  },
+  mistral: {
+    model: "mistral-medium-3.5",
   },
   ollama: {
     baseUrl: "http://127.0.0.1:11434/api",
@@ -99,7 +120,7 @@ const parseProvider = (
   const result = providerSchema.safeParse(trimmed);
   if (!result.success) {
     throw new Error(
-      `Invalid ${source} "${trimmed}". Expected auto, openai, ollama, or none.`,
+      `Invalid ${source} "${trimmed}". Expected auto, openai, mistral, ollama, or none.`,
     );
   }
 
@@ -202,6 +223,14 @@ export const loadAiConfig = ({
         userConfig.openai?.model ??
         defaultAiConfig.openai.model,
     },
+    mistral: {
+      apiKey: nonEmpty(env.MISTRAL_API_KEY) ?? userConfig.mistral?.apiKey,
+      baseUrl: nonEmpty(env.MISTRAL_BASE_URL) ?? userConfig.mistral?.baseUrl,
+      model:
+        nonEmpty(env.MISTRAL_MODEL) ??
+        userConfig.mistral?.model ??
+        defaultAiConfig.mistral.model,
+    },
     ollama: {
       baseUrl:
         nonEmpty(env.OLLAMA_HOST) ??
@@ -246,6 +275,10 @@ const pruneEmptySections = (config: UserConfig): UserConfig => {
 
   if (config.ollama && Object.keys(config.ollama).length === 0) {
     delete config.ollama;
+  }
+
+  if (config.mistral && Object.keys(config.mistral).length === 0) {
+    delete config.mistral;
   }
 
   return config;
@@ -307,6 +340,15 @@ export const setUserConfigValue = (
     case "openai.model":
       next.openai = { ...next.openai, model: normalizedValue };
       break;
+    case "mistral.apiKey":
+      next.mistral = { ...next.mistral, apiKey: normalizedValue };
+      break;
+    case "mistral.baseUrl":
+      next.mistral = { ...next.mistral, baseUrl: normalizedValue };
+      break;
+    case "mistral.model":
+      next.mistral = { ...next.mistral, model: normalizedValue };
+      break;
     case "ollama.baseUrl":
       next.ollama = { ...next.ollama, baseUrl: normalizedValue };
       break;
@@ -342,6 +384,15 @@ export const unsetUserConfigValue = (
     case "openai.model":
       delete next.openai?.model;
       break;
+    case "mistral.apiKey":
+      delete next.mistral?.apiKey;
+      break;
+    case "mistral.baseUrl":
+      delete next.mistral?.baseUrl;
+      break;
+    case "mistral.model":
+      delete next.mistral?.model;
+      break;
     case "ollama.baseUrl":
       delete next.ollama?.baseUrl;
       break;
@@ -358,6 +409,10 @@ export const redactUserConfig = (config: UserConfig): UserConfig => {
 
   if (redacted.openai?.apiKey) {
     redacted.openai.apiKey = "********";
+  }
+
+  if (redacted.mistral?.apiKey) {
+    redacted.mistral.apiKey = "********";
   }
 
   return redacted;

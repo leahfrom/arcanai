@@ -1,3 +1,4 @@
+import { createMistral } from "@ai-sdk/mistral";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
 import { createOllama } from "ollama-ai-provider-v2";
@@ -45,6 +46,40 @@ const openAiProvider: AiProvider = {
   },
 };
 
+const mistralProvider: AiProvider = {
+  id: "mistral",
+  label: "Mistral",
+  isAvailable: (config: AiConfig) => Boolean(config.mistral.apiKey),
+  async read(
+    request: ReadingRequest,
+    config: AiConfig,
+  ): Promise<ReadingResponse> {
+    const model = request.model ?? config.mistral.model;
+    const mistral = createMistral({
+      apiKey: config.mistral.apiKey,
+      baseURL: config.mistral.baseUrl,
+    });
+    const result = await generateText({
+      model: mistral(model),
+      prompt: buildReadingPrompt(request),
+      temperature: 0.8,
+      timeout: 45_000,
+      maxRetries: 0,
+    });
+
+    const text = result.text.trim();
+    if (!text) {
+      throw new Error("Mistral response did not include text.");
+    }
+
+    return {
+      provider: "mistral",
+      model,
+      text,
+    };
+  },
+};
+
 const ollamaProvider: AiProvider = {
   id: "ollama",
   label: "Ollama",
@@ -81,6 +116,7 @@ const ollamaProvider: AiProvider = {
 
 export const providers = {
   openai: openAiProvider,
+  mistral: mistralProvider,
   ollama: ollamaProvider,
 } as const;
 
@@ -95,7 +131,7 @@ export const readWithAi = async (
 
   const candidates: AiProvider[] =
     providerId === "auto"
-      ? [openAiProvider, ollamaProvider]
+      ? [openAiProvider, mistralProvider, ollamaProvider]
       : [providers[providerId]];
 
   for (const provider of candidates) {

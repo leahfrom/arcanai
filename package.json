@@ -1,6 +1,6 @@
 {
   "name": "arcanai",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "description": "A TypeScript CLI for drawing tarot cards and interpreting them with an LLM.",
   "type": "module",
   "repository": {
@@ -34,6 +34,7 @@
     "ink",
     "llm",
     "ai",
+    "mistral",
     "ollama",
     "openai"
   ],
@@ -43,6 +44,7 @@
     "node": ">=24"
   },
   "dependencies": {
+    "@ai-sdk/mistral": "^3.0.39",
     "@ai-sdk/openai": "^3.0.66",
     "ai": "^6.0.191",
     "ink": "^7.0.4",

@@ -31,6 +31,11 @@ describe("config", () => {
         baseUrl: undefined,
         model: "gpt-5.5",
       },
+      mistral: {
+        apiKey: undefined,
+        baseUrl: undefined,
+        model: "mistral-medium-3.5",
+      },
       ollama: {
         baseUrl: "http://127.0.0.1:11434/api",
         model: "llama3.2",
@@ -44,17 +49,25 @@ describe("config", () => {
       ARCANAI_PROVIDER: "ollama",
       OPENAI_API_KEY: "env-key",
       OPENAI_MODEL: "env-model",
+      MISTRAL_API_KEY: "env-mistral-key",
+      MISTRAL_MODEL: "env-mistral-model",
     };
 
     setUserConfigValue("provider", "openai", env);
     setUserConfigValue("openai.apiKey", "file-key", env);
     setUserConfigValue("openai.model", "file-model", env);
+    setUserConfigValue("mistral.apiKey", "file-mistral-key", env);
+    setUserConfigValue("mistral.model", "file-mistral-model", env);
 
     expect(loadAiConfig({ env, provider: "none" })).toMatchObject({
       provider: "none",
       openai: {
         apiKey: "env-key",
         model: "env-model",
+      },
+      mistral: {
+        apiKey: "env-mistral-key",
+        model: "env-mistral-model",
       },
     });
   });
@@ -63,11 +76,15 @@ describe("config", () => {
     const env = testEnv();
 
     setUserConfigValue("openai.apiKey", "sk-test", env);
+    setUserConfigValue("mistral.apiKey", "mk-test", env);
     setUserConfigValue("ollama.model", "mistral", env);
 
     expect(readUserConfig(env)).toEqual({
       openai: {
         apiKey: "sk-test",
+      },
+      mistral: {
+        apiKey: "mk-test",
       },
       ollama: {
         model: "mistral",
@@ -75,6 +92,9 @@ describe("config", () => {
     });
     expect(redactUserConfig(readUserConfig(env))).toEqual({
       openai: {
+        apiKey: "********",
+      },
+      mistral: {
         apiKey: "********",
       },
       ollama: {

@@ -34,6 +34,7 @@ const validSpreads = new Set<SpreadId>(["single", "three", "cross"]);
 const validProviders = new Set<ProviderId>([
   "auto",
   "openai",
+  "mistral",
   "ollama",
   "none",
 ]);
@@ -53,7 +54,7 @@ Usage
 Options
   -q, --question <text>      Question or theme for the reading
   -s, --spread <spread>      single, three, cross (default: three)
-  -p, --provider <provider>  auto, openai, ollama, none (default: auto)
+  -p, --provider <provider>  auto, openai, mistral, ollama, none (default: auto)
   -m, --model <model>        Override provider model
       --no-reversed          Draw upright cards only
       --json                 Print machine-readable output
@@ -65,11 +66,14 @@ Options
 
 Environment
   ARCANAI_CONFIG           Config path override
-  ARCANAI_PROVIDER         Default provider: auto, openai, ollama, none
+  ARCANAI_PROVIDER         Default provider: auto, openai, mistral, ollama, none
   ARCANAI_NO_UPDATE_CHECK  Disable the post-run update notice
   OPENAI_API_KEY             Enables the OpenAI provider
   OPENAI_MODEL               Default OpenAI model override
   OPENAI_BASE_URL            OpenAI-compatible API base URL
+  MISTRAL_API_KEY            Enables the Mistral provider
+  MISTRAL_MODEL              Default Mistral model override
+  MISTRAL_BASE_URL           Mistral-compatible API base URL
   OLLAMA_HOST                Ollama host, default http://127.0.0.1:11434
   ARCANAI_OLLAMA_MODEL       Default Ollama model override
 
@@ -79,6 +83,9 @@ Config keys
   openai.apiKey
   openai.baseUrl
   openai.model
+  mistral.apiKey
+  mistral.baseUrl
+  mistral.model
   ollama.baseUrl
   ollama.model
 `;
@@ -133,7 +140,7 @@ export const parseCliOptions = (argv: string[]): CliOptions => {
 
   if (provider !== undefined && typeof provider !== "string") {
     throw new Error(
-      `Invalid provider "${String(provider)}". Expected auto, openai, ollama, or none.`,
+      `Invalid provider "${String(provider)}". Expected auto, openai, mistral, ollama, or none.`,
     );
   }
 
@@ -142,7 +149,7 @@ export const parseCliOptions = (argv: string[]): CliOptions => {
     !validProviders.has(provider as ProviderId)
   ) {
     throw new Error(
-      `Invalid provider "${String(provider)}". Expected auto, openai, ollama, or none.`,
+      `Invalid provider "${String(provider)}". Expected auto, openai, mistral, ollama, or none.`,
     );
   }
 

@@ -22,4 +22,10 @@ describe("parseCliOptions", () => {
       parseCliOptions(["--update-check", "--no-update-check"]);
     }).toThrow("Use either --update-check or --no-update-check");
   });
+
+  it("accepts mistral as a provider", () => {
+    expect(parseCliOptions(["--provider", "mistral"])).toMatchObject({
+      provider: "mistral",
+    });
+  });
 });

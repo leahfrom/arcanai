@@ -25,4 +25,4 @@ export type AiProvider = {
   ) => Promise<ReadingResponse>;
 };
 
-export type ProviderId = "auto" | "openai" | "ollama" | "none";
+export type ProviderId = "auto" | "openai" | "mistral" | "ollama" | "none";
